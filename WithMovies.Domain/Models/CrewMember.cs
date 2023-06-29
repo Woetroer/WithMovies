@@ -4,7 +4,7 @@ namespace WithMovies.Domain.Models
 {
     public class CrewMember : BaseEntity
     {
-        public required int MovieId { get; set; }
+        public required List<int> MovieIds { get; set; }
         public required string CreditId { get; set; }
         public required Department Department { get; set; }
         public required int Gender { get; set; }

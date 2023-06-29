@@ -9,7 +9,7 @@ namespace WithMovies.Domain.Models
     public class Credits : BaseEntity
     {
         public required int MovieId {get; set;}
-        public required string Cast { get; set;}
-        public required string Crew { get; set;}
+        public required List<CastMember> Cast { get; set;}
+        public required List<CrewMember> Crew { get; set;}
     }
 }

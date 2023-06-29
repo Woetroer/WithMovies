@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WithMovies.Domain.Enums;
+﻿using WithMovies.Domain.Enums;
 
 namespace WithMovies.Domain.Models
 {
-    public class CrewMember
+    public class CrewMember : BaseEntity
     {
         public required int MovieId { get; set; }
         public required string CreditId { get; set; }

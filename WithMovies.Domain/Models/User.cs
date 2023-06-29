@@ -2,9 +2,9 @@
 {
     public class User : BaseEntity
     {
-        public required List<string> Friends { get; set; }
-        public required List<string> Watchlist { get; set; }
-        public required List<Review> Reviews { get; set; }
+        public required ICollection<User> Friends { get; set; }
+        public required ICollection<Movie> Watchlist { get; set; }
+        public required ICollection<Review> Reviews { get; set; }
 
     }
 }

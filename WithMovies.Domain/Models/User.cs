@@ -11,6 +11,6 @@ namespace WithMovies.Domain.Models
     {
         public required List<string> Friends { get; set; }
         public required List<string> Watchlist { get; set; }
-        
+        public required List<Review> Reviews { get; set; }
     }
 }

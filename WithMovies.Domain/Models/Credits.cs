@@ -8,8 +8,8 @@ namespace WithMovies.Domain.Models
 {
     public class Credits : BaseEntity
     {
-        public required int MovieId {get; set;}
-        public required List<CastMember> Cast { get; set;}
-        public required List<CrewMember> Crew { get; set;}
+        public required virtual Movie Movie {get; set;}
+        public required virtual ICollection<CastMember> Cast { get; set;}
+        public required virtual ICollection<CrewMember> Crew { get; set;}
     }
 }

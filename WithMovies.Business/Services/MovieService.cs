@@ -71,7 +71,7 @@ namespace WithMovies.Business.Services
 
             // for progress bar
             double progress = 0.0;
-            double step = 1.0 / (movieImports.Count() - 1);
+            double step = 1.0 / (movieImports.Count - 1);
 
             foreach (MovieImport import in movieImports)
             {

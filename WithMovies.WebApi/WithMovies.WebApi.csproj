@@ -10,6 +10,7 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'build-db' " />
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.8" />
@@ -27,7 +28,6 @@
 
   <ItemGroup>
     <Folder Include="..\dataset\" />
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -135,6 +135,8 @@ namespace WithMovies.Business.Services
 
             await _dataContext.AddRangeAsync(movies);
         }
+
+        public Task<Movie?> MovieGetById(int movieId) => _dataContext.Movies.FindAsync(movieId).AsTask();
     }
 }
 

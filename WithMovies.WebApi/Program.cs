@@ -47,13 +47,23 @@ namespace WithMovies.WebApi
 
             if (args.Length >= 1 && args[0] == "build-db")
             {
-                var json = File.Open(Path.Join(Directory.GetCurrentDirectory(), "../dataset/movies.json"), FileMode.Open);
+                var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+                var moviesJson = File.Open(Path.Join(Directory.GetCurrentDirectory(), "../dataset/movies.json"), FileMode.Open);
 
                 logger.LogInformation("Parsing movies");
-                await scope.ServiceProvider.GetRequiredService<IMovieService>().ImportJsonAsync(json);
+                await scope.ServiceProvider.GetRequiredService<IMovieService>().ImportJsonAsync(moviesJson);
 
                 logger.LogInformation("Saving movies to database");
-                await scope.ServiceProvider.GetRequiredService<DataContext>().SaveChangesAsync();
+                await db.SaveChangesAsync();
+
+                var keywordsJson = File.Open(Path.Join(Directory.GetCurrentDirectory(), "../dataset/keywords.json"), FileMode.Open);
+
+                logger.LogInformation("Parsing keywords");
+                await scope.ServiceProvider.GetRequiredService<IKeywordService>().ImportJsonAsync(keywordsJson);
+
+                logger.LogInformation("Saving keywords to database");
+                await db.SaveChangesAsync();
             }
 
             // Configure the HTTP request pipeline.

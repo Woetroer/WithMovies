@@ -3,8 +3,8 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 .DS_Store
-*.sqlite*
-*.sqlite3*
+**/*.sqlite*
+**/*.sqlite3*
 **/.DS_Store
 **/*.DS_Store
 

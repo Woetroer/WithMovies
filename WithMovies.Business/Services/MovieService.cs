@@ -78,14 +78,7 @@ namespace WithMovies.Business.Services
             }
         }
 
-        public async Task<Movie> Get(int movieId)
-        {
-            Movie wantedMovie = await _dataContext.Movies.FindAsync(movieId);
-            if ( wantedMovie == null)
-                throw new ArgumentOutOfRangeException("Can't find a movie with the given ID");
-                
-            return wantedMovie;
-        }
+        public Task<Movie?> MovieGetById(int movieId) => _dataContext.Movies.FindAsync(movieId).AsTask();
     }
 }
 

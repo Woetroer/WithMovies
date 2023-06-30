@@ -20,7 +20,7 @@ namespace WithMovies.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            MovieDto movieToReturn = (await _movieService.Get(id)).ToDto();
+            MovieDto movieToReturn = (await _movieService.MovieGetById(id)).ToDto();
             return Ok(movieToReturn);
         }
     }

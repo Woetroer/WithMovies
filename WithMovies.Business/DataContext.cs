@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Models;
 
 namespace WithMovies.Business
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
         public DbSet<CastMember> CastMembers { get; set; } = null!;
         public DbSet<Credits> Credits { get; set; } = null!;
@@ -15,6 +16,7 @@ namespace WithMovies.Business
         public DbSet<ProductionCompany> ProductionCompanies { get; set; } = null!;
         public DbSet<RecommendationProfile> RecommendationProfiles { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
 
         public DataContext() : base() { }
         public DataContext(DbContextOptions<DataContext> options) : base(options)
@@ -47,6 +49,8 @@ namespace WithMovies.Business
                     v => string.Join(",", v.ToArray()),
                     v => v.Split(new[] { ',' })
                 );
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

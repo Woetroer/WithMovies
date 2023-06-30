@@ -5,12 +5,6 @@ using WithMovies.Domain.Models;
 
 namespace WithMovies.Business.Services
 {
-    class KeywordImport
-    {
-        public required List<(string keyword, int[] movies)> Keywords;
-        public required int[] LenIndices;
-    }
-
     public class KeywordService : IKeywordService
     {
         private DataContext _dataContext;
@@ -24,28 +18,28 @@ namespace WithMovies.Business.Services
 
         public async Task ImportJsonAsync(Stream json)
         {
+            var keywordImports = (await JsonSerializer.DeserializeAsync<Dictionary<string, int[]>>(json))!;
             var keywords = new List<Keyword>();
-            var keywordImports = (await JsonSerializer.DeserializeAsync<KeywordImport>(json))!;
 
             // for progress bar
             double progress = 0.0;
-            double step = 1.0 / (keywordImports.Keywords.Count() - 1);
+            double step = 1.0 / (keywordImports.Count - 1);
 
-            foreach (var import in keywordImports.Keywords)
+            foreach (var import in keywordImports)
             {
                 progress += step;
 
                 string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
-                _logger.LogInformation($"{progressBar} Adding {import.keyword}");
+                _logger.LogInformation($"{progressBar} Adding {import.Key}");
 
                 keywords.Add(new Keyword
                 {
-                    Name = import.keyword,
-                    Movies = import.movies.Select(id => _dataContext.Movies.Find(id)!).ToList(),
+                    Name = import.Key,
+                    Movies = import.Value.Select(id => _dataContext.Movies.Find(id)!).ToList(),
                 });
             }
 
-            await _dataContext.AddRangeAsync(keywords);
+            await _dataContext.Keywords.AddRangeAsync(keywords);
         }
     }
 }

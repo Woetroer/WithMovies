@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="..\dataset\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
   <ItemGroup>

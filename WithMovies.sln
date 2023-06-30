@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WithMovies.Business", "WithMovies.Business\WithMovies.Business.csproj", "{54CB3C59-6814-45E9-AF3D-224758CEB5B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WithMovies.Business", "WithMovies.Business\WithMovies.Business.csproj", "{54CB3C59-6814-45E9-AF3D-224758CEB5B7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WithMovies.Domain", "WithMovies.Domain\WithMovies.Domain.csproj", "{D972CE56-B9BB-4510-8046-87B6C09AA8FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WithMovies.WebApi", "WithMovies.WebApi\WithMovies.WebApi.csproj", "{3BF550E3-D7C6-456E-8561-6D22095A70A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WithMovies.WebApi", "WithMovies.WebApi\WithMovies.WebApi.csproj", "{3BF550E3-D7C6-456E-8561-6D22095A70A3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WithMovies.Business.UnitTests", "WithMovies.Business.UnitTests\WithMovies.Business.UnitTests.csproj", "{6451B7F5-4E11-4E45-AA49-652BF738B3EF}"
 EndProject

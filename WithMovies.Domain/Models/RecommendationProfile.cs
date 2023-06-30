@@ -1,6 +1,6 @@
 ﻿namespace WithMovies.Domain.Models
 {
-    public class RecommendationProfile
+    public class RecommendationProfile : BaseEntity
     {
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace WithMovies.Domain.Enums
 {
-	public enum Genre
+	public enum Genre : int
 	{
         Crime,
         Adventure,

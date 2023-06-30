@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WithMovies.Domain.Enums;
 using WithMovies.Domain.Models;
 
 namespace WithMovies.Business
@@ -16,6 +17,36 @@ namespace WithMovies.Business
         public DbSet<Review> Reviews { get; set; } = null!;
 
         public DataContext() : base() { }
-        public DataContext(DbContextOptions<DataContext> options) : base(options) { }
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .Entity<Movie>()
+                .Property(e => e.Genres)
+                .HasConversion(
+                    v => string.Join(",", v.Select(e => e.ToString("D")).ToArray()),
+                    v => v.Split(new[] { ',' })
+                      .Select(e => Enum.Parse(typeof(Genre), e))
+                      .Cast<Genre>()
+                      .ToList()
+                );
+            modelBuilder
+                .Entity<Movie>()
+                .Property(e => e.ProductionCountries)
+                .HasConversion(
+                    v => string.Join(",", v.ToArray()),
+                    v => v.Split(new[] { ',' })
+                );
+            modelBuilder
+                .Entity<Movie>()
+                .Property(e => e.SpokenLanguages)
+                .HasConversion(
+                    v => string.Join(",", v.ToArray()),
+                    v => v.Split(new[] { ',' })
+                );
+        }
     }
 }

@@ -36,6 +36,15 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "build-db": {
+      "commandName": "Project",
+      "commandLineArgs": "build-db",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:12219;http://localhost:48126",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }

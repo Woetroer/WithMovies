@@ -6,6 +6,6 @@ namespace WithMovies.Domain.Models
     public abstract class BaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public required int Id { get; set; }
+        public int Id { get; set; }
     }
 }

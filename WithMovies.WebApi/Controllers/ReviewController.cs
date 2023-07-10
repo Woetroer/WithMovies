@@ -29,5 +29,12 @@ namespace WithMovies.WebApi.Controllers
 
             return Ok("Your review is added!");
         }
+
+        [HttpDelete, Authorize(Roles = "Admin")]
+        public async Task<IActionResult>DeleteReview(int id)
+        {
+            await _reviewService.Delete(id);
+            return Ok();
+        }
     }
 }

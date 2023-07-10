@@ -11,6 +11,7 @@ namespace WithMovies.Domain.Interfaces
     {
         Task Create(int userId, int movieId, int rating, string? message, DateTime postedTime);
         Task<Review> Read(int id);
+        Task Update(Review review);
         Task Delete(int id);
     }
 }

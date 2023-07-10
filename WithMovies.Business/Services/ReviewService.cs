@@ -34,6 +34,12 @@ namespace WithMovies.Business.Services
             return await _dataContext.Reviews.FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task Update(Review review)
+        {
+            _dataContext.Reviews.Update(review);
+            await _dataContext.SaveChangesAsync();
+        }
+
         public async Task Delete(int id)
         {
             Review reviewToDelete = Read(id).Result;

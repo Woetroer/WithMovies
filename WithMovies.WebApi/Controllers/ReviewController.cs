@@ -23,11 +23,31 @@ namespace WithMovies.WebApi.Controllers
         [HttpPost, Authorize]
         public async Task<IActionResult>CreateReview(ReviewToAdd reviewToAdd)
         {
-            var user = _userManager.Users.First(x => x.UserName == User.Identity!.Name!);
+            var user = _userManager.Users.First(x => x.UserName == User.Identity!.Name!); //Needs UserIdentity
 
             await _reviewService.Create(user.Id, reviewToAdd.MovieId, reviewToAdd.Rating, reviewToAdd.Message, DateTime.Now);
 
             return Ok("Your review is added!");
+        }
+
+        public record UpdateArgs(int ReviewId, int MovieId, int Rating, string? Message);
+        [HttpPost, Authorize]
+        public async Task<IActionResult> UpdateReview(UpdateArgs reviewToUpdate)
+        {
+            var review = await _reviewService.Read(reviewToUpdate.ReviewId);
+
+            if (review == null)
+                return NotFound();
+
+            if (review.UserId != User.Identity!.Name!) //Needs UserIdentity
+                return Unauthorized();
+
+            review.Message = reviewToUpdate.Message;
+            review.Rating = reviewToUpdate.Rating;
+
+            await _reviewService.Update(review);
+
+            return Ok();
         }
 
         [HttpDelete, Authorize(Roles = "Admin")]

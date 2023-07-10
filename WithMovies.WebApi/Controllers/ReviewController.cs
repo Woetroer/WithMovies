@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WithMovies.Domain.Interfaces;
+using WithMovies.Domain.Models;
 
 namespace WithMovies.WebApi.Controllers
 {
@@ -9,16 +12,22 @@ namespace WithMovies.WebApi.Controllers
     public class ReviewController : ControllerBase
     {
         private readonly IReviewService _reviewService;
-        public ReviewController(IReviewService reviewService)
+        private readonly UserManager<User> _userManager;
+        public ReviewController(IReviewService reviewService, UserManager<User> userManager)
         {
             _reviewService = reviewService;
+            _userManager = userManager;
         }
 
-        public record ReviewToAdd(int Userid, int MovieId, int Rating, string? Message, DateTime PosedTime);
-        [HttpPost]
+        public record ReviewToAdd(int MovieId, int Rating, string? Message);
+        [HttpPost, Authorize]
         public async Task<IActionResult>CreateReview(ReviewToAdd reviewToAdd)
         {
+            var user = _userManager.Users.First(x => x.UserName == User.Identity!.Name!);
 
+            await _reviewService.Create(user.Id, reviewToAdd.MovieId, reviewToAdd.Rating, reviewToAdd.Message, DateTime.Now);
+
+            return Ok("Your review is added!");
         }
     }
 }

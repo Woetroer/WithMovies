@@ -1,7 +1,8 @@
 ﻿using WithMovies.Domain.Enums;
 using WithMovies.Domain.Models;
 
-namespace WithMovies.WebApi.Dto
+
+namespace WithMovies.WebApi.Dtos
 {
     public class MovieDto
     {
@@ -14,10 +15,10 @@ namespace WithMovies.WebApi.Dto
         public bool Adult { get; set; }
         public string? Overview { get; set; }
         public int Budget { get; set; }
-        public ICollection<Genre>? Genres { get; set; }
+        public ICollection<string>? Genres { get; set; }
         public string? HomePage { get; set; }
         public string? PosterPath { get; set; }
-        public ICollection<ProductionCompany>? ProductionCompanies { get; set; }
+        public ICollection<NamedId>? ProductionCompanies { get; set; }
         /// <summary>
         /// ISO-3166_1 country code
         /// </summary>

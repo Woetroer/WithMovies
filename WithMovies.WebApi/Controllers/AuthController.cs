@@ -97,42 +97,6 @@ namespace WithMovies.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        [Route("register-admin")]
-        public async Task<IActionResult> RegisterAdmin([FromBody] Register model)
-        {
-            await CheckIfValid(model);
-
-            var userByUsername = await _userManager.FindByNameAsync(model.Username);
-            if (userByUsername != null) return Conflict(new { Username = new List<string>() { "Username already exists" } });
-
-            var userByEmail = await _userManager.FindByEmailAsync(model.Email);
-            if (userByEmail != null) return Conflict(new { Email = new List<string>() { "Email already exists" } });
-
-            var user = new User
-            {
-                Email = model.Email,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username,
-                Friends = new List<User>(),
-                Watchlist = new List<Movie>(),
-                Reviews = new List<Review>()
-            };
-
-            // Create user
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, string.Join(';', result.Errors.Select(x => x.Description)));
-
-            if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
-                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
-
-            if (await _roleManager.RoleExistsAsync(UserRoles.Admin))
-                await _userManager.AddToRoleAsync(user, UserRoles.Admin);
-
-            return Ok();
-        }
-
         private async Task<IActionResult> CheckIfValid(Register model)
         {
             if (model == null) return BadRequest();

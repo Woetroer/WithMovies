@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Extensions;
-using WithMovies.WebApi.Dtos;
+using WithMovies.WebApi.Dto;
 
 namespace WithMovies.WebApi.Controllers
 {

@@ -1,12 +1,14 @@
-using System.Collections.Concurrent;
-using System.Runtime.Versioning;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Runtime.Versioning;
 
 namespace WithMovies.Business;
 
 [UnsupportedOSPlatform("browser")]
 [ProviderAlias("ColorConsole")]
+[DebuggerStepThrough()]
 public class ColorConsoleLoggerProvider : ILoggerProvider
 {
     private readonly IDisposable? _onChangeToken;
@@ -18,7 +20,7 @@ public class ColorConsoleLoggerProvider : ILoggerProvider
         _config = config.CurrentValue;
         _onChangeToken = config.OnChange(updatedConfig => _config = updatedConfig);
     }
-    
+
     public ILogger CreateLogger(string categoryName) =>
         _loggers.GetOrAdd(categoryName, name => new ColorConsoleLogger(name, GetConfig));
 

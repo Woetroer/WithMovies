@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WithMovies.Domain.Interfaces;
-using WithMovies.Domain.Models;
+using WithMovies.WebApi.Dtos;
 using WithMovies.WebApi.Extensions;
-using WithMovies.WebApi.Dto;
 
 namespace WithMovies.WebApi.Controllers
 {
@@ -17,10 +15,18 @@ namespace WithMovies.WebApi.Controllers
             _movieService = movieService;
         }
 
+        [Route("GetPreview")]
+        [HttpGet]
+        public async Task<IActionResult> GetPopularMovies()
+        {
+            List<PreviewDto> preview = (await _movieService.GetPopularMovies()).ToPreviewDto();
+            return Ok(preview);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            MovieDto movieToReturn = (await _movieService.MovieGetById(id)).ToDto();
+            MovieDto movieToReturn = (await _movieService.GetById(id)).ToDto();
             if (movieToReturn == null) { return NotFound(); }
             return Ok(movieToReturn);
         }

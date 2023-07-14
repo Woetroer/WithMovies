@@ -15,7 +15,7 @@ namespace WithMovies.WebApi.Dtos
         public bool Adult { get; set; }
         public string? Overview { get; set; }
         public int Budget { get; set; }
-        public ICollection<string>? Genres { get; set; }
+        public ICollection<int>? Genres { get; set; }
         public string? HomePage { get; set; }
         public string? PosterPath { get; set; }
         public ICollection<NamedId>? ProductionCompanies { get; set; }

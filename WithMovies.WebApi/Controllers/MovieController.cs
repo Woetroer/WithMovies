@@ -15,7 +15,7 @@ namespace WithMovies.WebApi.Controllers
             _movieService = movieService;
         }
 
-        [Route("GetPreview")]
+        [Route("GetPopularMovies")]
         [HttpGet]
         public async Task<IActionResult> GetPopularMovies()
         {

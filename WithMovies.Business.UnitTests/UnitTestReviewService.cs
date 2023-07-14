@@ -1,6 +1,6 @@
 namespace WithMovies.Business.UnitTests
 {
-    public class UnitTest1
+    public class UnitTestReviewService
     {
         [Fact]
         public void Test1()

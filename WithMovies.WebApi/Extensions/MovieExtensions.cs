@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
-using WithMovies.WebApi.Dto;
+using WithMovies.WebApi.Dtos;
 
 
 namespace WithMovies.WebApi.Extensions
@@ -21,10 +21,10 @@ namespace WithMovies.WebApi.Extensions
             dto.Adult = movie.Adult;
             dto.Overview = movie.Overview;
             dto.Budget = movie.Budget;
-            dto.Genres = movie.Genres;
+            //dto.Genres = movie.Genres;
             dto.HomePage = movie.HomePage;
             dto.PosterPath = movie.PosterPath;
-            dto.ProductionCompanies = movie.ProductionCompanies;
+            //dto.ProductionCompanies = movie.ProductionCompanies;
             dto.ProductionCountries = movie.ProductionCountries;
             dto.ReleaseDate = movie.ReleaseDate;
             dto.Revenue = movie.Revenue;

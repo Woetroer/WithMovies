@@ -17,10 +17,9 @@ namespace WithMovies.WebApi.Controllers
 
         [Route("GetPreview")]
         [HttpGet]
-        public async Task<IActionResult> GetPreview()
+        public async Task<IActionResult> GetPopularMovies()
         {
-            List<PreviewDto> preview = (await _movieService.GetPreview()).ToPreviewDto();
-            if (preview == null) { return NotFound(); }
+            List<PreviewDto> preview = (await _movieService.GetPopularMovies()).ToPreviewDto();
             return Ok(preview);
         }
 

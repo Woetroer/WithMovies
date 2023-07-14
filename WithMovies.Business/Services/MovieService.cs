@@ -137,7 +137,7 @@ namespace WithMovies.Business.Services
         }
 
         public Task<Movie?> GetById(int movieId) => _dataContext.Movies.FindAsync(movieId).AsTask();
-        public Task<List<Movie>> GetPreview() => _dataContext.Movies.OrderByDescending(movie => movie.VoteCount).Take(50).ToListAsync();
+        public Task<List<Movie>> GetPopularMovies() => _dataContext.Movies.OrderByDescending(movie => movie.VoteCount).Take(50).ToListAsync();
     }
 }
 

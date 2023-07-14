@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
@@ -136,7 +136,8 @@ namespace WithMovies.Business.Services
             await _dataContext.AddRangeAsync(movies);
         }
 
-        public Task<Movie?> MovieGetById(int movieId) => _dataContext.Movies.FindAsync(movieId).AsTask();
+        public Task<Movie?> GetById(int movieId) => _dataContext.Movies.FindAsync(movieId).AsTask();
+        public Task<List<Movie>> GetPreview() => _dataContext.Movies.OrderBy(movie => movie.Popularity).Take(50).ToListAsync();
     }
 }
 

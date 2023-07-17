@@ -32,6 +32,7 @@ namespace WithMovies.Domain.Models
         public required double VoteAverage { get; set; }
         public required int VoteCount { get; set; }
         public required double Popularity { get; set; }
+        public required virtual ICollection<string?> Keywords { get; set; }
     }
 
 }

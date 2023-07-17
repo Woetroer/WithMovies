@@ -49,6 +49,13 @@ namespace WithMovies.Business
                     v => string.Join(",", v.ToArray()),
                     v => v.Split(new[] { ',' })
                 );
+            modelBuilder
+                .Entity<Movie>()
+                .Property(e => e.Keywords)
+                .HasConversion(
+                    v => string.Join("\n", v.ToArray()),
+                    v => v.Split(new[] { '\n' })
+                );
 
             base.OnModelCreating(modelBuilder);
         }

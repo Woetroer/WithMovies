@@ -7,9 +7,19 @@ namespace WithMovies.WebApi.Extensions
     {
         public static MovieDto ToDto(this Movie movie)
         {
-            MovieDto dto = new MovieDto();
+            MovieDto dto = new();
             dto.ImdbId = movie.ImdbId;
-            dto.BelongsToCollection = movie.BelongsToCollection;
+            if (movie.BelongsToCollection != null)
+            {
+                dto.BelongsToCollection = new MovieCollectionDto
+                {
+                    Id = movie.BelongsToCollection.Id,
+                    Name = movie.BelongsToCollection.Name,
+                    PosterPath = movie.BelongsToCollection.PosterPath,
+                    BackdropPath = movie.BelongsToCollection.BackdropPath,
+                    ItemCount = movie.BelongsToCollection.Movies.Count
+                };
+            }
             dto.Title = movie.Title;
             dto.Tagline = movie.Tagline;
             dto.OriginalLanguage = movie.OriginalLanguage;
@@ -30,6 +40,7 @@ namespace WithMovies.WebApi.Extensions
             dto.VoteAverage = movie.VoteAverage;
             dto.VoteCount = movie.VoteCount;
             dto.Popularity = movie.Popularity;
+            dto.Keywords = movie.Keywords;
 
             return dto;
         }

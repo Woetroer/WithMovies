@@ -72,9 +72,11 @@ namespace WithMovies.Business.Services
             // for progress bar
             double progress = 0.0;
             double step = 1.0 / (movieImports.Count - 1);
+            int index = 0;
 
             foreach (MovieImport import in movieImports)
             {
+                index++;
                 progress += step;
 
                 //if (import is null)
@@ -102,8 +104,11 @@ namespace WithMovies.Business.Services
                     }
                 }
 
-                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
-                _logger.LogInformation($"{progressBar} Adding {import.Title}");
+                if (index % 100 == 0)
+                {
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
+                    _logger.LogInformation(progressBar);
+                }
 
                 movies.Add(new Movie
                 {
@@ -130,6 +135,7 @@ namespace WithMovies.Business.Services
                     Title = import.Title,
                     VoteAverage = import.VoteAverage,
                     VoteCount = import.VoteCount,
+                    Keywords = new List<string>(),
                 });
             }
 

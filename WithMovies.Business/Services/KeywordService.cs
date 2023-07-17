@@ -24,18 +24,29 @@ namespace WithMovies.Business.Services
             // for progress bar
             double progress = 0.0;
             double step = 1.0 / (keywordImports.Count - 1);
+            int index = 0;
 
             foreach (var import in keywordImports)
             {
+                index++;
                 progress += step;
 
-                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
-                _logger.LogInformation($"{progressBar} Adding {import.Key}");
+                if (index % 100 == 0)
+                {
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
+                    _logger.LogInformation(progressBar);
+                }
 
                 keywords.Add(new Keyword
                 {
                     Name = import.Key,
-                    Movies = import.Value.Select(id => _dataContext.Movies.Find(id)!).ToList(),
+                    Movies = import.Value.Select(id =>
+                    {
+                        var movie = _dataContext.Movies.Find(id)!;
+                        movie.Keywords.Add(import.Key);
+                        _dataContext.Update(movie);
+                        return movie;
+                    }).ToList(),
                 });
             }
 

@@ -18,29 +18,37 @@ namespace WithMovies.Business.Services
 
         public async Task ImportJsonAsync(Stream json)
         {
-            var keywordImports = (await JsonSerializer.DeserializeAsync<Dictionary<string, int[]>>(json))!;
+            var keywordImports = (
+                await JsonSerializer.DeserializeAsync<Dictionary<string, int[]>>(json)
+            )!;
             var keywords = new List<Keyword>();
 
             // for progress bar
             double progress = 0.0;
             double step = 1.0 / (keywordImports.Count - 1);
+            int iteration = 0;
 
             foreach (var import in keywordImports)
             {
                 progress += step;
+                iteration++;
 
-                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
-                _logger.LogInformation($"{progressBar} Adding {import.Key}");
-
-                keywords.Add(new Keyword
+                if (iteration % 500 == 0)
                 {
-                    Name = import.Key,
-                    Movies = import.Value.Select(id => _dataContext.Movies.Find(id)!).ToList(),
-                });
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
+                    _logger.LogInformation($"{progressBar} Adding keywords");
+                }
+
+                keywords.Add(
+                    new Keyword
+                    {
+                        Name = import.Key,
+                        Movies = import.Value.Select(id => _dataContext.Movies.Find(id)!).ToList(),
+                    }
+                );
             }
 
             await _dataContext.Keywords.AddRangeAsync(keywords);
         }
     }
 }
-

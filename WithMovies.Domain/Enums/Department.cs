@@ -2,15 +2,16 @@
 
 public enum Department
 {
-    Lighting,
-    Camera,
-    Sound,
     Production,
-    Writing,
-    CostumeAndMakeUp,
     Directing,
     Editing,
-    Crew,
+    Camera,
+    Lighting,
+    Actors,
     VisualEffects,
     Art,
+    Writing,
+    CostumeAndMakeUp,
+    Sound,
+    Crew,
 }

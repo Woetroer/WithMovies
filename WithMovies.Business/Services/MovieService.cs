@@ -49,10 +49,12 @@ namespace WithMovies.Business.Services
         private DataContext _dataContext;
         private ILogger<MovieService> _logger;
 
-        public MovieService(DataContext dataContext,
-                            IMovieCollectionService movieCollectionService,
-                            IProductionCompanyService productionCompanyService,
-                            ILogger<MovieService> logger)
+        public MovieService(
+            DataContext dataContext,
+            IMovieCollectionService movieCollectionService,
+            IProductionCompanyService productionCompanyService,
+            ILogger<MovieService> logger
+        )
         {
             _dataContext = dataContext;
             _movieCollectionService = movieCollectionService;
@@ -63,19 +65,23 @@ namespace WithMovies.Business.Services
         public async Task ImportJsonAsync(Stream json)
         {
             var options = new JsonSerializerOptions();
-            options.Converters.Add(new GenreJsonConverter());
-            options.Converters.Add(new MovieStatusJsonConverter());
+            options.Converters.Add(new GenericEnumJsonConverter<Genre>());
+            options.Converters.Add(new GenericEnumJsonConverter<MovieStatus>());
 
             var movies = new List<Movie>();
-            var movieImports = (await JsonSerializer.DeserializeAsync<List<MovieImport>>(json, options))!;
+            var movieImports = (
+                await JsonSerializer.DeserializeAsync<List<MovieImport>>(json, options)
+            )!;
 
             // for progress bar
             double progress = 0.0;
             double step = 1.0 / (movieImports.Count - 1);
+            int iteration = 0;
 
             foreach (MovieImport import in movieImports)
             {
                 progress += step;
+                iteration++;
 
                 //if (import is null)
                 //    throw new ArgumentException("Incorrect import");
@@ -88,7 +94,11 @@ namespace WithMovies.Business.Services
 
                 if (import.BelongsToCollection is MovieCollectionImport collectionImport)
                 {
-                    if (!await _movieCollectionService.MovieCollectionExistsAsync(collectionImport.Name))
+                    if (
+                        !await _movieCollectionService.MovieCollectionExistsAsync(
+                            collectionImport.Name
+                        )
+                    )
                     {
                         collection = await _movieCollectionService.MovieCollectionCreateAsync(
                             collectionImport.Name,
@@ -98,46 +108,64 @@ namespace WithMovies.Business.Services
                     }
                     else
                     {
-                        collection = await _movieCollectionService.MovieCollectionGetByNameAsync(collectionImport.Name);
+                        collection = await _movieCollectionService.MovieCollectionGetByNameAsync(
+                            collectionImport.Name
+                        );
                     }
                 }
 
-                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
-                _logger.LogInformation($"{progressBar} Adding {import.Title}");
-
-                movies.Add(new Movie
+                if (iteration % 500 == 0)
                 {
-                    Id = import.Id,
-                    ImdbId = import.ImdbId,
-                    Adult = import.Adult,
-                    BelongsToCollection = collection,
-                    Budget = import.Budget,
-                    Genres = import.Genres,
-                    HomePage = import.Homepage,
-                    OriginalLanguage = import.OriginalLanguage,
-                    OriginalTitle = import.OriginalTitle,
-                    Overview = import.Overview,
-                    Popularity = import.Popularity,
-                    PosterPath = import.PosterPath,
-                    ProductionCompanies = import.ProductionCompanies.Select(c => new ProductionCompany { Name = c.Name }).ToList(),
-                    ProductionCountries = import.ProductionCountries,
-                    ReleaseDate = import.ReleaseDate != null ? new DateTime(import.ReleaseDate[0], 1, 1).AddDays(import.ReleaseDate[1]) : null,
-                    Revenue = import.Revenue,
-                    Runtime = import.Runtime != null ? new TimeSpan(0, 0, import.Runtime[0], import.Runtime[1]) : null,
-                    SpokenLanguages = import.SpokenLanguages,
-                    Status = import.MovieStatus ?? MovieStatus.None,
-                    Tagline = import.Tagline,
-                    Title = import.Title,
-                    VoteAverage = import.VoteAverage,
-                    VoteCount = import.VoteCount,
-                });
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
+                    _logger.LogInformation($"{progressBar} Adding movies");
+                }
+
+                movies.Add(
+                    new Movie
+                    {
+                        Id = import.Id,
+                        ImdbId = import.ImdbId,
+                        Adult = import.Adult,
+                        BelongsToCollection = collection,
+                        Budget = import.Budget,
+                        Genres = import.Genres,
+                        HomePage = import.Homepage,
+                        OriginalLanguage = import.OriginalLanguage,
+                        OriginalTitle = import.OriginalTitle,
+                        Overview = import.Overview,
+                        Popularity = import.Popularity,
+                        PosterPath = import.PosterPath,
+                        ProductionCompanies = import.ProductionCompanies
+                            .Select(c => new ProductionCompany { Name = c.Name })
+                            .ToList(),
+                        ProductionCountries = import.ProductionCountries,
+                        ReleaseDate =
+                            import.ReleaseDate != null
+                                ? new DateTime(import.ReleaseDate[0], 1, 1).AddDays(
+                                    import.ReleaseDate[1]
+                                )
+                                : null,
+                        Revenue = import.Revenue,
+                        Runtime =
+                            import.Runtime != null
+                                ? new TimeSpan(0, 0, import.Runtime[0], import.Runtime[1])
+                                : null,
+                        SpokenLanguages = import.SpokenLanguages,
+                        Status = import.MovieStatus ?? MovieStatus.None,
+                        Tagline = import.Tagline,
+                        Title = import.Title,
+                        VoteAverage = import.VoteAverage,
+                        VoteCount = import.VoteCount,
+                    }
+                );
             }
 
             await _dataContext.AddRangeAsync(movies);
         }
 
         public Task<Movie?> GetById(int movieId) => _dataContext.Movies.FindAsync(movieId).AsTask();
-        public Task<List<Movie>> GetPopularMovies() => _dataContext.Movies.OrderByDescending(movie => movie.VoteCount).Take(50).ToListAsync();
+
+        public Task<List<Movie>> GetPopularMovies() =>
+            _dataContext.Movies.OrderByDescending(movie => movie.VoteCount).Take(50).ToListAsync();
     }
 }
-

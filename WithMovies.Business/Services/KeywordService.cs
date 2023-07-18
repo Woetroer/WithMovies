@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using WithMovies.Domain;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 
@@ -18,7 +19,9 @@ namespace WithMovies.Business.Services
 
         public async Task ImportJsonAsync(Stream json)
         {
-            var keywordImports = (await JsonSerializer.DeserializeAsync<Dictionary<string, int[]>>(json))!;
+            var keywordImports = (
+                await JsonSerializer.DeserializeAsync<Dictionary<string, int[]>>(json)
+            )!;
             var keywords = new List<Keyword>();
 
             // for progress bar
@@ -29,18 +32,29 @@ namespace WithMovies.Business.Services
             {
                 progress += step;
 
-                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
+                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
                 _logger.LogInformation($"{progressBar} Adding {import.Key}");
 
-                keywords.Add(new Keyword
-                {
-                    Name = import.Key,
-                    Movies = import.Value.Select(id => _dataContext.Movies.Find(id)!).ToList(),
-                });
+                keywords.Add(
+                    new Keyword
+                    {
+                        Name = import.Key,
+                        Movies = import.Value.Select(id => _dataContext.Movies.Find(id)!).ToList(),
+                    }
+                );
             }
 
             await _dataContext.Keywords.AddRangeAsync(keywords);
         }
+
+        public Task<List<Keyword>> FindKeywordGroups(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<KeywordSuggestion>> FindKeywordSuggestions(string text)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
-

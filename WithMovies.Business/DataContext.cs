@@ -16,12 +16,12 @@ namespace WithMovies.Business
         public DbSet<ProductionCompany> ProductionCompanies { get; set; } = null!;
         public DbSet<RecommendationProfile> RecommendationProfiles { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
-        public DbSet<User> Users { get; set; } = null!;
 
-        public DataContext() : base() { }
-        public DataContext(DbContextOptions<DataContext> options) : base(options)
-        {
-        }
+        public DataContext()
+            : base() { }
+
+        public DataContext(DbContextOptions<DataContext> options)
+            : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,25 +30,20 @@ namespace WithMovies.Business
                 .Property(e => e.Genres)
                 .HasConversion(
                     v => string.Join(",", v.Select(e => e.ToString("D")).ToArray()),
-                    v => v.Split(new[] { ',' })
-                      .Select(e => Enum.Parse(typeof(Genre), e))
-                      .Cast<Genre>()
-                      .ToList()
+                    v =>
+                        v.Split(new[] { ',' })
+                            .Select(e => Enum.Parse(typeof(Genre), e))
+                            .Cast<Genre>()
+                            .ToList()
                 );
             modelBuilder
                 .Entity<Movie>()
                 .Property(e => e.ProductionCountries)
-                .HasConversion(
-                    v => string.Join(",", v.ToArray()),
-                    v => v.Split(new[] { ',' })
-                );
+                .HasConversion(v => string.Join(",", v.ToArray()), v => v.Split(new[] { ',' }));
             modelBuilder
                 .Entity<Movie>()
                 .Property(e => e.SpokenLanguages)
-                .HasConversion(
-                    v => string.Join(",", v.ToArray()),
-                    v => v.Split(new[] { ',' })
-                );
+                .HasConversion(v => string.Join(",", v.ToArray()), v => v.Split(new[] { ',' }));
 
             base.OnModelCreating(modelBuilder);
         }

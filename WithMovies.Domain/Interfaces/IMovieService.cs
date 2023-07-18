@@ -9,4 +9,3 @@ namespace WithMovies.Domain.Interfaces
         Task<List<Movie>> GetPopularMovies();
     }
 }
-

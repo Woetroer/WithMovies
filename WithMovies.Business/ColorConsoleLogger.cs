@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace WithMovies.Business;
 
+[DebuggerStepThrough()]
 public sealed class ColorConsoleLoggerConfiguration
 {
     public int EventId { get; set; }
@@ -20,6 +22,7 @@ public sealed class ColorConsoleLoggerConfiguration
     };
 }
 
+[DebuggerStepThrough()]
 public class ColorConsoleLogger : ILogger
 {
     private readonly string _name;

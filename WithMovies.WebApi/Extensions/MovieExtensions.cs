@@ -1,9 +1,5 @@
-﻿using Microsoft.JSInterop.Infrastructure;
-using System.Runtime.CompilerServices;
-using WithMovies.Domain.Interfaces;
-using WithMovies.Domain.Models;
+﻿using WithMovies.Domain.Models;
 using WithMovies.WebApi.Dtos;
-
 
 namespace WithMovies.WebApi.Extensions
 {
@@ -21,10 +17,10 @@ namespace WithMovies.WebApi.Extensions
             dto.Adult = movie.Adult;
             dto.Overview = movie.Overview;
             dto.Budget = movie.Budget;
-            //dto.Genres = movie.Genres;
+            dto.Genres = movie.Genres.Cast<int>().ToList();
             dto.HomePage = movie.HomePage;
             dto.PosterPath = movie.PosterPath;
-            //dto.ProductionCompanies = movie.ProductionCompanies;
+            dto.ProductionCompanies = movie.ProductionCompanies.Select(p => new NamedId { Id = p.Id, Name = p.Name }).ToList();
             dto.ProductionCountries = movie.ProductionCountries;
             dto.ReleaseDate = movie.ReleaseDate;
             dto.Revenue = movie.Revenue;
@@ -37,5 +33,23 @@ namespace WithMovies.WebApi.Extensions
 
             return dto;
         }
+
+        public static List<PreviewDto> ToPreviewDto(this List<Movie> movies)
+        {
+            List<PreviewDto> dtos = new();
+            foreach (Movie movie in movies)
+            {
+                PreviewDto dto = new PreviewDto()
+                {
+                    Id = movie.Id,
+                    Title = movie.Title,
+                    PosterPath = movie.PosterPath,
+                    Tagline = movie.Tagline
+                };
+                dtos.Add(dto);
+            }
+            return dtos;
+        }
     }
 }
+

@@ -72,7 +72,7 @@ namespace WithMovies.WebApi
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
-                                  policy => { policy.WithOrigins("Hier komt localhost met angular poort").AllowAnyHeader().AllowAnyMethod(); });
+                                  policy => { policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod(); });
             });
 
             var app = builder.Build();
@@ -117,6 +117,8 @@ namespace WithMovies.WebApi
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.MapControllers();
 

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using WithMovies.Domain;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 
@@ -49,6 +50,16 @@ namespace WithMovies.Business.Services
             }
 
             await _dataContext.Keywords.AddRangeAsync(keywords);
+        }
+
+        public Task<List<Keyword>> FindKeywordGroups(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<KeywordSuggestion>> FindKeywordSuggestions(string text)
+        {
+            throw new NotImplementedException();
         }
     }
 }

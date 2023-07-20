@@ -42,6 +42,8 @@ namespace WithMovies.Business.UnitTests
         public DatabaseUtilities()
         {
             _dataContext = new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlite("Data Source=test-db.sqlite").UseLazyLoadingProxies().Options);
+
+            SetValues();
         }
 
 
@@ -326,6 +328,38 @@ namespace WithMovies.Business.UnitTests
             {
                 Id = 0
             };
+        }
+
+        public async Task Prepare()
+        {
+            await _dataContext.Database.EnsureDeletedAsync();
+            await _dataContext.Database.EnsureCreatedAsync();
+
+            SetValues();
+
+            await _dataContext.AddAsync(TestUser);
+            await _dataContext.AddAsync(TestAdmin);
+
+            await _dataContext.AddAsync(TestMovie1);
+            await _dataContext.AddAsync(TestMovie2);
+            await _dataContext.AddAsync(TestMovie3);
+            await _dataContext.AddAsync(TestMovie4);
+            await _dataContext.AddAsync(TestMovie5);
+            await _dataContext.AddAsync(TestMovie6);
+            await _dataContext.AddAsync(TestMovieCollection1);
+            await _dataContext.AddAsync(TestMovieCollection2);
+
+            await _dataContext.AddAsync(TestReview1);
+            await _dataContext.AddAsync(TestReview2);
+            await _dataContext.AddAsync(TestReview3);
+
+            await _dataContext.AddAsync(TestCastmember1);
+            await _dataContext.AddAsync(TestCrewmember1);
+            await _dataContext.AddAsync(TestCompany1);
+
+            await _dataContext.AddAsync(TestKeyword1);
+            await _dataContext.AddAsync(TestRecommendation1);
+
         }
     }
 }

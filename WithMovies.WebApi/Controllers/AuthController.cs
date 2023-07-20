@@ -11,7 +11,7 @@ namespace WithMovies.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : MyControllerBase
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -26,7 +26,7 @@ namespace WithMovies.WebApi.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] Login model)
+        public async Task<IActionResult> Login(Login model)
         {
             if (model == null) return BadRequest();
             var user = await _userManager.FindByNameAsync(model.Username);
@@ -63,7 +63,7 @@ namespace WithMovies.WebApi.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] Register model)
+        public async Task<IActionResult> Register(Register model)
         {
             await CheckIfValid(model);
 

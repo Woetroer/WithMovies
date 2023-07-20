@@ -31,7 +31,6 @@ namespace WithMovies.Business.UnitTests
 
         public CastMember TestCastmember1 { get; set; }
         public CrewMember TestCrewmember1 { get; set; }
-        public Credits TestCredits1 { get; set; }
         public ProductionCompany TestCompany1 { get; set; }
 
 
@@ -82,7 +81,10 @@ namespace WithMovies.Business.UnitTests
                 Status = MovieStatus.Released,
                 VoteAverage = 3.10,
                 VoteCount = 200,
-                Popularity = 4.23
+                Popularity = 4.23,
+                Cast = new List<CastMember>() { TestCastmember1 },
+                Crew = new List<CrewMember>() { TestCrewmember1 },
+                Reviews = new List<Review>() { TestReview1, TestReview2, TestReview3 }
             };
 
             TestMovie2 = new Movie
@@ -109,7 +111,10 @@ namespace WithMovies.Business.UnitTests
                 Status = MovieStatus.Released,
                 VoteAverage = 3.10,
                 VoteCount = 200,
-                Popularity = 4.23
+                Popularity = 4.23,
+                Cast = new List<CastMember>() { TestCastmember1 },
+                Crew = new List<CrewMember>() { TestCrewmember1 },
+                Reviews = new List<Review>() { TestReview1, TestReview2, TestReview3 }
             };
 
             TestMovie3 = new Movie
@@ -136,7 +141,10 @@ namespace WithMovies.Business.UnitTests
                 Status = MovieStatus.Released,
                 VoteAverage = 3.10,
                 VoteCount = 200,
-                Popularity = 4.23
+                Popularity = 4.23,
+                Cast = new List<CastMember>() { TestCastmember1 },
+                Crew = new List<CrewMember>() { TestCrewmember1 },
+                Reviews = new List<Review>() { TestReview1, TestReview2, TestReview3 }
             };
 
             TestMovie4 = new Movie
@@ -163,7 +171,10 @@ namespace WithMovies.Business.UnitTests
                 Status = MovieStatus.Released,
                 VoteAverage = 3.10,
                 VoteCount = 200,
-                Popularity = 4.23
+                Popularity = 4.23,
+                Cast = new List<CastMember>() { TestCastmember1 },
+                Crew = new List<CrewMember>() { TestCrewmember1 },
+                Reviews = new List<Review>() { TestReview1, TestReview2, TestReview3 }
             };
 
             TestMovie5 = new Movie
@@ -190,7 +201,10 @@ namespace WithMovies.Business.UnitTests
                 Status = MovieStatus.Released,
                 VoteAverage = 3.10,
                 VoteCount = 200,
-                Popularity = 4.23
+                Popularity = 4.23,
+                Cast = new List<CastMember>() { TestCastmember1 },
+                Crew = new List<CrewMember>() { TestCrewmember1 },
+                Reviews = new List<Review>() { TestReview1, TestReview2, TestReview3 }
             };
 
             TestMovie6 = new Movie
@@ -217,7 +231,11 @@ namespace WithMovies.Business.UnitTests
                 Status = MovieStatus.Released,
                 VoteAverage = 3.10,
                 VoteCount = 200,
-                Popularity = 4.23
+                Popularity = 4.23,
+                Cast = new List<CastMember>() { TestCastmember1},
+                Crew = new List<CrewMember>() { TestCrewmember1},
+                Reviews = new List<Review>() { TestReview1, TestReview2, TestReview3 }
+
             };
 
             TestMovieCollection1 = new MovieCollection
@@ -241,7 +259,7 @@ namespace WithMovies.Business.UnitTests
             TestReview1 = new Review
             {
                 Id = 0,
-                User = TestUser,
+                Author = TestUser,
                 Movie = TestMovie1,
                 Rating = 5,
                 Message = "Best review!",
@@ -251,7 +269,7 @@ namespace WithMovies.Business.UnitTests
             TestReview2 = new Review
             {
                 Id = 1,
-                User = TestUser,
+                Author = TestUser,
                 Movie = TestMovie2,
                 Rating = 3,
                 Message = "Pretty mid",
@@ -261,7 +279,7 @@ namespace WithMovies.Business.UnitTests
             TestReview3 = new Review
             {
                 Id = 3,
-                User = TestUser,
+                Author = TestUser,
                 Movie = TestMovie3,
                 Rating = 1,
                 Message = "Awful!",
@@ -270,8 +288,8 @@ namespace WithMovies.Business.UnitTests
 
             TestCastmember1 = new CastMember
             {
+                Id = 0,
                 CastId = 0,
-                Credits = TestCredits1,
                 Movies = new List<Movie> { TestMovie1, TestMovie2, TestMovie3, TestMovie4 },
                 Character = "Character1",
                 Gender = 0,
@@ -284,19 +302,11 @@ namespace WithMovies.Business.UnitTests
             {
                 Id = 0,
                 Movies = new List<Movie> { TestMovie1, TestMovie2, TestMovie3, TestMovie4 },
-                Credits = TestCredits1,
                 Department = Department.Art,
                 Gender = 1,
-                Job = Job.Animation,
+                Job = "Animation",
                 Name = "Johny Smith",
                 ProfilePath = "ProfilePath2"
-            };
-
-            TestCredits1 = new Credits
-            {
-                Movie = TestMovie1,
-                Cast = new List<CastMember> { TestCastmember1 },
-                Crew = new List<CrewMember> { TestCrewmember1 }
             };
 
             TestCompany1 = new ProductionCompany

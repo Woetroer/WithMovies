@@ -15,12 +15,12 @@ namespace WithMovies.Business.Services
         private DataContext _dataContext;
         private ILogger<MovieService> _logger;
 
-        public async Task Create(User user, int movieId, int rating, string? message, DateTime postedTime)
+        public async Task Create(User user, Movie movie, int rating, string? message, DateTime postedTime)
         {
             Review reviewToAdd = new Review()
             {
-                User = user,
-                MovieId = movieId,
+                Author = user,
+                Movie = movie,
                 Rating = rating,
                 Message = message,
                 PostedTime = postedTime

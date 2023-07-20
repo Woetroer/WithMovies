@@ -9,7 +9,7 @@ namespace WithMovies.Domain.Interfaces
 {
     public interface IReviewService
     {
-        Task Create(User userId, int movieId, int rating, string? message, DateTime postedTime);
+        Task Create(User userId, Movie movie, int rating, string? message, DateTime postedTime);
         Task<Review> Read(int id);
         Task<List<Review>> ReadAll(int id);
         Task Update(Review review);

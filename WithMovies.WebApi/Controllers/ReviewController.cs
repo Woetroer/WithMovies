@@ -21,10 +21,12 @@ namespace WithMovies.WebApi.Controllers
     public class ReviewController : ControllerBase
     {
         private readonly IReviewService _reviewService;
+        private readonly IMovieService _movieService;
         private readonly UserManager<User> _userManager;
-        public ReviewController(IReviewService reviewService ,UserManager<User> userManager)
+        public ReviewController(IReviewService reviewService, IMovieService movieService, UserManager<User> userManager)
         {
             _reviewService = reviewService;
+            _movieService = movieService;
             _userManager = userManager;
         }
 
@@ -32,9 +34,10 @@ namespace WithMovies.WebApi.Controllers
         [HttpPost, Authorize]
         public async Task<IActionResult>CreateReview(ReviewToAdd reviewToAdd)
         {
+            Movie movie = await _movieService.GetById(reviewToAdd.MovieId);
             var user = _userManager.Users.First(x => x.UserName == User.Identity!.Name!);
 
-            await _reviewService.Create(user, reviewToAdd.MovieId, reviewToAdd.Rating, reviewToAdd.Message, DateTime.Now);
+            await _reviewService.Create(user, movie, reviewToAdd.Rating, reviewToAdd.Message, DateTime.Now);
 
             return Ok("Your review is added!");
         }
@@ -59,7 +62,7 @@ namespace WithMovies.WebApi.Controllers
             if (review == null)
                 return NotFound();
 
-            if (review.User.UserName != User.Identity!.Name!)
+            if (review.Author.UserName != User.Identity!.Name!)
                 return Unauthorized();
 
             review.Message = reviewToUpdate.Message;
@@ -82,7 +85,7 @@ namespace WithMovies.WebApi.Controllers
         {
             var review = await _reviewService.Read(id);
 
-            if (review.User.UserName != User.Identity!.Name!)
+            if (review.Author.UserName != User.Identity!.Name!)
                 return Unauthorized();
 
             await _reviewService.Update(review);

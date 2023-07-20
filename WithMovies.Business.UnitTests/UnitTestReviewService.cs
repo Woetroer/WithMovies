@@ -7,7 +7,7 @@ using WithMovies.Domain.Models;
 
 namespace WithMovies.Business.UnitTests
 {
-    public class UnitTest1
+    public class UnitTestReviewService
     {
 
         IServiceCollection _services {get; set;}

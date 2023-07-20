@@ -27,13 +27,18 @@ namespace WithMovies.Business.Services
             // for progress bar
             double progress = 0.0;
             double step = 1.0 / (keywordImports.Count - 1);
+            int iteration = 0;
 
             foreach (var import in keywordImports)
             {
                 progress += step;
+                iteration++;
 
-                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
-                _logger.LogInformation($"{progressBar} Adding {import.Key}");
+                if (iteration % 500 == 0)
+                {
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
+                    _logger.LogInformation($"{progressBar} Adding keywords");
+                }
 
                 keywords.Add(
                     new Keyword

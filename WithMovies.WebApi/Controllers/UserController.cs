@@ -16,7 +16,7 @@ namespace WithMovies.WebApi.Controllers
             _userManager = userManager;
         }
 
-        [HttpPut("change-username/{newUsername}")]
+        [HttpPut("change-username/{newUsername}"), Authorize]
         public async Task<IActionResult> ChangeUsername(string newUsername)
         {
             User? user = await _userManager.FindByIdAsync(UserId);
@@ -30,7 +30,7 @@ namespace WithMovies.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPut("change-email/{newEmail}")]
+        [HttpPut("change-email/{newEmail}"), Authorize]
         public async Task<IActionResult> ChangeEmail(string newEmail)
         {
             User? user = await _userManager.FindByIdAsync(UserId);

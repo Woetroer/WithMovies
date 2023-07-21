@@ -27,7 +27,6 @@ namespace WithMovies.WebApi.Controllers
         [HttpPost("user"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> Block(Profile profile)
         {
-
             var user = _userManager.Users.Where(x => x.Email == profile.Email && x.UserName == profile.Username).FirstOrDefault();
             string name = user.UserName;
             await _userService.Block(user);

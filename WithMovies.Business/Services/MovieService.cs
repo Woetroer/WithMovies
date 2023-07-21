@@ -80,7 +80,6 @@ namespace WithMovies.Business.Services
 
             foreach (MovieImport import in movieImports)
             {
-                index++;
                 progress += step;
                 iteration++;
 

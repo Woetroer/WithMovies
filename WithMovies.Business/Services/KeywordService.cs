@@ -31,7 +31,6 @@ namespace WithMovies.Business.Services
 
             foreach (var import in keywordImports)
             {
-                index++;
                 progress += step;
                 iteration++;
 

@@ -21,8 +21,8 @@ namespace WithMovies.WebApi
             builder.Configuration.AddJsonFile("appsettings.json");
 
             builder.Services.AddDbContext<DataContext>(
-                options => options.UseSqlite("Data Source=db.sqlite3;")
-                                  .UseLazyLoadingProxies());
+                options => options.UseSqlite("Data Source=db.sqlite3;").UseLazyLoadingProxies()
+            );
 
             builder.Services.AddControllers();
 
@@ -32,28 +32,34 @@ namespace WithMovies.WebApi
             builder.Services.AddScoped<IProductionCompanyService, ProductionCompanyService>();
             builder.Services.AddScoped<IMovieCollectionService, MovieCollectionService>();
             builder.Services.AddScoped<IKeywordService, KeywordService>();
+            builder.Services.AddScoped<ICreditsService, CreditsService>();
             builder.Services.AddScoped<IMovieService, MovieService>();
-            builder.Services.AddLogging(x => x.ClearProviders()
-                                              .AddConfiguration(builder.Configuration.GetSection("Logging"))
-                                              .AddColorConsoleLogger(options =>
-                                              {
+            builder.Services.AddLogging(
+                x =>
+                    x.ClearProviders()
+                        .AddConfiguration(builder.Configuration.GetSection("Logging"))
+                        .AddColorConsoleLogger(options =>
+                        {
 #if DEBUG
-                                                  options.Mask.Add(LogLevel.Debug);
+                            options.Mask.Add(LogLevel.Debug);
 #endif
-                                              })
-                                              .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None));
+                        })
+                        .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None)
+            );
 
             // Authentication
-            builder.Services.AddIdentity<User, IdentityRole>()
+            builder.Services
+                .AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
 
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(options =>
                 {
                     options.SaveToken = true;
@@ -65,7 +71,9 @@ namespace WithMovies.WebApi
                         ValidateAudience = true,
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+                        )
                     };
                 });
 
@@ -126,20 +134,49 @@ namespace WithMovies.WebApi
             {
                 var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-                var moviesJson = File.Open(Path.Join(Directory.GetCurrentDirectory(), "../dataset/movies.json"), FileMode.Open);
+                var moviesJson = File.Open(
+                    Path.Join(Directory.GetCurrentDirectory(), "../dataset/movies.json"),
+                    FileMode.Open
+                );
 
                 logger.LogInformation("Parsing movies");
-                await scope.ServiceProvider.GetRequiredService<IMovieService>().ImportJsonAsync(moviesJson);
+                await scope.ServiceProvider
+                    .GetRequiredService<IMovieService>()
+                    .ImportJsonAsync(moviesJson);
 
                 logger.LogInformation("Saving movies to database");
                 await db.SaveChangesAsync();
 
-                var keywordsJson = File.Open(Path.Join(Directory.GetCurrentDirectory(), "../dataset/keywords.json"), FileMode.Open);
+                var keywordsJson = File.Open(
+                    Path.Join(Directory.GetCurrentDirectory(), "../dataset/keywords.json"),
+                    FileMode.Open
+                );
 
                 logger.LogInformation("Parsing keywords");
-                await scope.ServiceProvider.GetRequiredService<IKeywordService>().ImportJsonAsync(keywordsJson);
+                await scope.ServiceProvider
+                    .GetRequiredService<IKeywordService>()
+                    .ImportJsonAsync(keywordsJson);
 
                 logger.LogInformation("Saving keywords to database");
+                await db.SaveChangesAsync();
+
+                logger.LogInformation("Parsing credits");
+                var creditsService = scope.ServiceProvider.GetRequiredService<ICreditsService>();
+
+                for (int i = 0; i < 10; i++)
+                {
+                    await creditsService.ImportJsonAsync(
+                        File.Open(
+                            Path.Join(
+                                Directory.GetCurrentDirectory(),
+                                $"../dataset/credits_{i}.json"
+                            ),
+                            FileMode.Open
+                        )
+                    );
+                }
+
+                logger.LogInformation("Saving credits to database");
                 await db.SaveChangesAsync();
             }
 
@@ -158,6 +195,8 @@ namespace WithMovies.WebApi
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.MapControllers();
 

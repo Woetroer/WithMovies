@@ -6,7 +6,6 @@ namespace WithMovies.Domain.Interfaces
     {
         Task ImportJsonAsync(Stream json);
         Task<Movie?> GetById(int id);
-        Task<List<Movie>> GetPreview();
+        Task<List<Movie>> GetPopularMovies();
     }
 }
-

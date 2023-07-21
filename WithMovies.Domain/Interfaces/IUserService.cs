@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WithMovies.Domain.Models;
 
 namespace WithMovies.Domain.Interfaces
 {
-    public interface IProfileService
+    public interface IUserService
     {
-        Task Delete(int id);
-        Task Block(int id);
-        Task ReviewRights(int id);
+        Task Delete(User user);
+        Task Block(User user);
+        Task ReviewRights(User user);
     }
 }

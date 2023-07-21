@@ -34,10 +34,15 @@ namespace WithMovies.WebApi.Controllers
         [HttpPost, Authorize]
         public async Task<IActionResult>CreateReview(ReviewToAdd reviewToAdd)
         {
-            Movie movie = await _movieService.GetById(reviewToAdd.MovieId);
             var user = _userManager.Users.First(x => x.UserName == User.Identity!.Name!);
 
-            await _reviewService.Create(user, movie, reviewToAdd.Rating, reviewToAdd.Message, DateTime.Now);
+            if (user.CanReview!)
+                return Unauthorized("You've been blocked from making more reviews.");
+
+            Movie movie = await _movieService.GetById(reviewToAdd.MovieId);
+
+            if (user.CanReview)
+                await _reviewService.Create(user, movie, reviewToAdd.Rating, reviewToAdd.Message, DateTime.Now);
 
             return Ok("Your review is added!");
         }

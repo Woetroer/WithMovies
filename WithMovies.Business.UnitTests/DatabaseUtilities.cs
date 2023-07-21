@@ -56,7 +56,22 @@ namespace WithMovies.Business.UnitTests
                 Id = "my cool GUID",
                 Friends = new List<User>(),
                 Watchlist = new List<Movie>(),
-                Reviews = new List<Review>()
+                Reviews = new List<Review>(),
+                IsBlocked = false,
+                CanReview = true
+            };
+
+            TestAdmin = new User
+            {
+                Email = "adminname@email.nl",
+                UserName = "TestAdmin",
+                Id = "my cooler GUID",
+                Friends = new List<User>(),
+                Watchlist = new List<Movie>(),
+                Reviews = new List<Review>(),
+                IsBlocked = false,
+                CanReview = true,
+                //Claim = "Admin"
             };
 
             TestMovie1 = new Movie

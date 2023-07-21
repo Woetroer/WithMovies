@@ -7,5 +7,8 @@ namespace WithMovies.Domain.Models
         public virtual ICollection<User> Friends { get; set; } = null!;
         public virtual ICollection<Movie> Watchlist { get; set; } = null!;
         public virtual ICollection<Review> Reviews { get; set; } = null!;
+
+        public required bool IsBlocked { get; set; }
+        public required bool CanReview { get; set; }
     }
 }

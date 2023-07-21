@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Globalization;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
@@ -161,7 +162,9 @@ namespace WithMovies.Data.Sqlite
             }
 
             builder.Append($"-1) AS Weight FROM Keywords ");
-            builder.Append($"WHERE Weight > {weightThreshold} ");
+            builder.Append(
+                $"WHERE Weight > {weightThreshold.ToString(CultureInfo.InvariantCulture)} "
+            );
             builder.Append("ORDER BY Weight DESC LIMIT 25;");
 
             return builder.ToString();

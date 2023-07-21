@@ -19,10 +19,7 @@ namespace WithMovies.Business.Services
         }
         public async Task Block(User user)
         {
-            if (user.IsBlocked = false)
-                user.IsBlocked = true;
-            if (user.IsBlocked)
-                user.IsBlocked = false;
+            user.IsBlocked = !user.IsBlocked;
 
             await _dataContext.SaveChangesAsync();
         }
@@ -36,10 +33,7 @@ namespace WithMovies.Business.Services
 
         public async Task ReviewRights(User user)
         {
-            if (user.CanReview = false)
-                user.CanReview = true;
-            if (user.CanReview)
-                user.CanReview = false;
+            user.CanReview = !user.CanReview;
 
             await _dataContext.SaveChangesAsync();
         }

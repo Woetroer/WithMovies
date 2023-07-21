@@ -24,8 +24,8 @@ namespace WithMovies.WebApi.Controllers
 
         public record Profile(string Email, string Username);
         
-        [HttpPost("user"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Block(Profile profile)
+        [HttpPost, Route("block"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ToggleBlock(Profile profile)
         {
             var user = _userManager.Users.Where(x => x.Email == profile.Email && x.UserName == profile.Username).FirstOrDefault();
             string name = user.UserName;
@@ -34,7 +34,7 @@ namespace WithMovies.WebApi.Controllers
             return Ok("User " + name + " is blocked.");
         }
 
-        [HttpPost("user"), Authorize(Roles = "Admin")]
+        [HttpPost, Route("reviewright"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> ToggleReviewRight(Profile profile)
         {
             var user = _userManager.Users.Where(x => x.Email == profile.Email && x.UserName == profile.Username).FirstOrDefault();
@@ -48,7 +48,7 @@ namespace WithMovies.WebApi.Controllers
             return Ok("User " + user + " can review once again.");
         }
 
-        [HttpDelete, Authorize(Roles = "Admin")]
+        [HttpDelete, Route("delete"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(Profile profile)
         {
             var user = _userManager.Users.Where(x => x.Email == profile.Email && x.UserName == profile.Username).FirstOrDefault();

@@ -54,7 +54,7 @@ namespace WithMovies.Data.Sqlite
 
                 if (iteration % 500 == 0)
                 {
-                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
                     _logger.LogInformation($"{progressBar} Adding keywords");
                 }
 
@@ -95,7 +95,7 @@ namespace WithMovies.Data.Sqlite
 
             var script = BuildSuggestKeywordsScript(text.Count(c => c == ' ') + 1, 0.85f);
 
-            _logger.LogDebug("Running script:\n" + script);
+            _logger.LogInformation("Running script:\n" + script);
 
             var keywords = await _dataContext
                 .Set<KeywordRecord>()

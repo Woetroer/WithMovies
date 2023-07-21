@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using WithMovies.Domain;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Models;
 
@@ -16,10 +17,13 @@ namespace WithMovies.Business
         public DbSet<RecommendationProfile> RecommendationProfiles { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
 
-        public DataContext()
-            : base() { }
+        // Fake table, doesn't actually exist. This is used in KeywordService
+        public virtual DbSet<KeywordRecord> KeywordRecords { get; set; } = null!;
 
         public DataContext(DbContextOptions<DataContext> options)
+            : base(options) { }
+
+        protected DataContext(DbContextOptions options)
             : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,6 +72,8 @@ namespace WithMovies.Business
             modelBuilder.Entity<User>().HasMany(m => m.Friends);
             modelBuilder.Entity<User>().HasMany(m => m.Watchlist);
             modelBuilder.Entity<User>().HasMany(m => m.Reviews).WithOne(r => r.Author);
+
+            modelBuilder.Entity<KeywordRecord>().HasNoKey();
 
             base.OnModelCreating(modelBuilder);
         }

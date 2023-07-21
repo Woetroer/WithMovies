@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WithMovies.Business;
 
@@ -10,9 +11,11 @@ using WithMovies.Business;
 namespace WithMovies.Business.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230720113907_KeywordRecordUpdate")]
+    partial class KeywordRecordUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,7 +197,7 @@ namespace WithMovies.Business.Migrations
                     b.ToTable("MovieProductionCompany");
                 });
 
-            modelBuilder.Entity("WithMovies.Domain.KeywordRecord", b =>
+            modelBuilder.Entity("WithMovies.Business.Services.KeywordService+KeywordRecord", b =>
                 {
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
@@ -202,7 +205,7 @@ namespace WithMovies.Business.Migrations
                     b.Property<float?>("Weight")
                         .HasColumnType("REAL");
 
-                    b.ToTable("KeywordRecords");
+                    b.ToTable("KeywordRecord");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.CastMember", b =>

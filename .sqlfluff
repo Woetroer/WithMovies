@@ -1,0 +1,6 @@
+[sqlfluff]
+templater = placeholder
+
+[sqlfluff:templater:placeholder]
+param_style = colon
+text = super man wakanda new york city skylines

@@ -34,19 +34,27 @@ namespace WithMovies.Business
                 .HasConversion(
                     v => string.Join(",", v.Select(e => e.ToString("D")).ToArray()),
                     v =>
-                        v.Split(new[] { ',' })
-                            .Select(e => Enum.Parse(typeof(Genre), e))
-                            .Cast<Genre>()
-                            .ToList()
+                        string.IsNullOrWhiteSpace(v)
+                            ? new List<Genre>()
+                            : v.Split(new[] { ',' })
+                                .Select(e => Enum.Parse(typeof(Genre), e))
+                                .Cast<Genre>()
+                                .ToList()
                 );
             modelBuilder
                 .Entity<Movie>()
                 .Property(e => e.ProductionCountries)
-                .HasConversion(v => string.Join(",", v.ToArray()), v => v.Split(new[] { ',' }));
+                .HasConversion(
+                    v => string.Join(",", v.ToArray()),
+                    v => string.IsNullOrWhiteSpace(v) ? new List<string?>() : v.Split(new[] { ',' })
+                );
             modelBuilder
                 .Entity<Movie>()
                 .Property(e => e.SpokenLanguages)
-                .HasConversion(v => string.Join(",", v.ToArray()), v => v.Split(new[] { ',' }));
+                .HasConversion(
+                    v => string.Join(",", v.ToArray()),
+                    v => string.IsNullOrWhiteSpace(v) ? new List<string?>() : v.Split(new[] { ',' })
+                );
 
             modelBuilder.Entity<CastMember>().HasMany(m => m.Movies).WithMany(m => m.Cast);
             modelBuilder.Entity<CrewMember>().HasMany(m => m.Movies).WithMany(m => m.Crew);

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WithMovies.Business;
 
@@ -10,9 +11,11 @@ using WithMovies.Business;
 namespace WithMovies.Business.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230720113628_KeywordRecord")]
+    partial class KeywordRecord
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,15 +197,16 @@ namespace WithMovies.Business.Migrations
                     b.ToTable("MovieProductionCompany");
                 });
 
-            modelBuilder.Entity("WithMovies.Domain.KeywordRecord", b =>
+            modelBuilder.Entity("WithMovies.Business.Services.KeywordService+KeywordRecord", b =>
                 {
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<float?>("Weight")
+                    b.Property<float>("Weight")
                         .HasColumnType("REAL");
 
-                    b.ToTable("KeywordRecords");
+                    b.ToTable("KeywordRecord");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.CastMember", b =>
@@ -307,10 +311,6 @@ namespace WithMovies.Business.Migrations
 
                     b.Property<int?>("KeywordId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Keywords")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("OriginalLanguage")
                         .HasColumnType("TEXT");

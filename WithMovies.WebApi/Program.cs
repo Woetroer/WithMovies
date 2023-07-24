@@ -8,6 +8,7 @@ using WithMovies.Business;
 using WithMovies.Business.Services;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
+using WithMovies.Data.Sqlite;
 
 namespace WithMovies.WebApi
 {
@@ -29,9 +30,13 @@ namespace WithMovies.WebApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddSingleton<
+                IDatabaseExtensionsLoaderService,
+                SqliteDatabaseExtensionsLoaderService
+            >();
             builder.Services.AddScoped<IProductionCompanyService, ProductionCompanyService>();
             builder.Services.AddScoped<IMovieCollectionService, MovieCollectionService>();
-            builder.Services.AddScoped<IKeywordService, KeywordService>();
+            builder.Services.AddScoped<IKeywordService, SqliteKeywordService>();
             builder.Services.AddScoped<ICreditsService, CreditsService>();
             builder.Services.AddScoped<IMovieService, MovieService>();
             builder.Services.AddLogging(

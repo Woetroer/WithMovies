@@ -11,16 +11,15 @@ namespace WithMovies.Business.Services
 {
     public class UserService : IUserService
     {
-
         private DataContext _dataContext;
         public UserService(DataContext dataContext)
         {
             _dataContext = dataContext;
         }
+
         public async Task Block(User user)
         {
             user.IsBlocked = !user.IsBlocked;
-
             await _dataContext.SaveChangesAsync();
         }
 
@@ -34,7 +33,6 @@ namespace WithMovies.Business.Services
         public async Task ReviewRights(User user)
         {
             user.CanReview = !user.CanReview;
-
             await _dataContext.SaveChangesAsync();
         }
     }

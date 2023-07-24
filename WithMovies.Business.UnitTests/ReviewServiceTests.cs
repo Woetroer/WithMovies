@@ -4,6 +4,7 @@ using WithMovies.Domain.Enums;
 
 namespace WithMovies.Business.UnitTests;
 
+[Collection("Dbtests")]
 public class ReviewServiceTests : UnitTestBase<IReviewService>
 {
     [Theory]
@@ -49,7 +50,14 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
         User author = new User
         {
             UserName = "Person",
+            RecommendationProfile = new RecommendationProfile
+            {
+                GenreWeights = new float[20],
+            }
         };
+
+        context.Add(movie);
+        context.Add(author);
 
         context.Add(new Review {
             Id = 1,

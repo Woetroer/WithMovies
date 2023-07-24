@@ -22,7 +22,7 @@
         /// </code>
         /// </example>
         /// </summary>
-        public required bool[] ExplicitelyLikedGenres { get; set; } = new bool[20];
+        public virtual bool[] ExplicitelyLikedGenres { get; set; } = new bool[20];
 
         // Outputs
 

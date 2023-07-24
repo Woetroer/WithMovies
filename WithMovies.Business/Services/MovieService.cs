@@ -163,7 +163,7 @@ namespace WithMovies.Business.Services
             await _dataContext.AddRangeAsync(movies);
         }
 
-        public Task<Movie?> GetById(int movieId) => _dataContext.Movies.FindAsync(movieId).AsTask();
+        public Task<Movie?> GetById(int movieId) => _dataContext.Movies.Include(m => m.Keywords).FirstOrDefaultAsync(m => m.Id == movieId);
 
         public Task<List<Movie>> GetPopularMovies() =>
             _dataContext.Movies.OrderByDescending(movie => movie.VoteCount).Take(50).ToListAsync();

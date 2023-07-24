@@ -40,7 +40,7 @@ namespace WithMovies.WebApi.Extensions
             dto.VoteAverage = movie.VoteAverage;
             dto.VoteCount = movie.VoteCount;
             dto.Popularity = movie.Popularity;
-            dto.Keywords = movie.Keywords;
+            dto.Keywords = movie.Keywords.Select(k => k.Name).ToList();
 
             return dto;
         }

@@ -57,6 +57,13 @@ namespace WithMovies.Business
                     v => string.Join(",", v.ToArray()),
                     v => string.IsNullOrWhiteSpace(v) ? new List<string?>() : v.Split(new[] { ',' })
                 );
+            //modelBuilder
+            //    .Entity<Movie>()
+            //    .Property(e => e.Keywords)
+            //    .HasConversion(
+            //        v => string.Join("\n", v.ToArray()),
+            //        v => string.IsNullOrWhiteSpace(v) ? new List<string>() : v.Split(new[] { '\n' })
+            //    );
 
             modelBuilder
                 .Entity<RecommendationProfile>()
@@ -65,7 +72,7 @@ namespace WithMovies.Business
 
             modelBuilder.Entity<CastMember>().HasMany(m => m.Movies).WithMany(m => m.Cast);
             modelBuilder.Entity<CrewMember>().HasMany(m => m.Movies).WithMany(m => m.Crew);
-            modelBuilder.Entity<Keyword>().HasMany(m => m.Movies);
+            modelBuilder.Entity<Keyword>().HasMany(m => m.Movies).WithMany(m => m.Keywords);
             modelBuilder.Entity<Movie>().HasOne(m => m.BelongsToCollection).WithMany(c => c.Movies);
             modelBuilder
                 .Entity<Movie>()
@@ -74,6 +81,7 @@ namespace WithMovies.Business
             modelBuilder.Entity<Movie>().HasMany(m => m.Cast).WithMany(c => c.Movies);
             modelBuilder.Entity<Movie>().HasMany(m => m.Crew).WithMany(c => c.Movies);
             modelBuilder.Entity<Movie>().HasMany(m => m.Reviews).WithOne(c => c.Movie);
+            modelBuilder.Entity<Movie>().HasMany(m => m.Keywords).WithMany(k => k.Movies);
             modelBuilder
                 .Entity<MovieCollection>()
                 .HasMany(m => m.Movies)

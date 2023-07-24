@@ -24,7 +24,7 @@ namespace WithMovies.Business.Services
         public async Task Create(
             User user,
             Movie movie,
-            int rating,
+            double rating,
             string? message,
             DateTime postedTime
         )
@@ -50,13 +50,15 @@ namespace WithMovies.Business.Services
         public async Task Update(Review review)
         {
             _dataContext.Reviews.Update(review);
+            
             await _dataContext.SaveChangesAsync();
         }
 
         public async Task Delete(int id)
         {
-            Review reviewToDelete = Read(id).Result;
-            _dataContext.Reviews.Remove(reviewToDelete);
+            if (await Read(id) is Review review)
+                _dataContext.Remove(review);
+            
             await _dataContext.SaveChangesAsync();
         }
     }

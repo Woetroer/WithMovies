@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
@@ -49,7 +50,7 @@ public class CreditsService : ICreditsService
 
             if (iteration % 500 == 0)
             {
-                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
+                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
                 _logger.LogInformation($"{progressBar} Adding credits");
             }
 
@@ -71,5 +72,11 @@ public class CreditsService : ICreditsService
             movie.Crew = credit.Crew;
             _dataContext.Update(movie);
         }
+    }
+
+    public async Task<List<CastMember>> CastGetFiveAsync()
+    {
+        List<CastMember> result = await _dataContext.CastMembers.ToListAsync();
+        return result;
     }
 }

@@ -43,6 +43,9 @@ public class CreditsService : ICreditsService
         double step = 1.0 / (credits.Count - 1);
         int iteration = 0;
 
+        // var movies = await _dataContext.Movies.ToDictionaryAsync(m => m.Id);
+        var movies = new Dictionary<int, Movie>();
+
         foreach (var credit in credits)
         {
             progress += step;
@@ -64,10 +67,13 @@ public class CreditsService : ICreditsService
                 member.Id = default;
             }
 
-            await _dataContext.AddRangeAsync(credit.Cast);
-            await _dataContext.AddRangeAsync(credit.Crew);
+            // await _dataContext.AddRangeAsync(credit.Cast);
+            // await _dataContext.AddRangeAsync(credit.Crew);
 
-            var movie = (await _movieService.GetById(credit.Id))!;
+            if (!movies.ContainsKey(credit.Id))
+                movies[credit.Id] = (await _dataContext.Movies.FindAsync(credit.Id))!;
+
+            var movie = movies[credit.Id];
             movie.Cast = credit.Cast;
             movie.Crew = credit.Crew;
             _dataContext.Update(movie);

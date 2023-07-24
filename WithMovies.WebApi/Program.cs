@@ -143,6 +143,8 @@ namespace WithMovies.WebApi
 
             if (args.Length >= 1 && args[0] == "build-db")
             {
+                DateTime startTime = DateTime.Now;
+
                 var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
                 var moviesJson = File.Open(
@@ -185,10 +187,12 @@ namespace WithMovies.WebApi
                             FileMode.Open
                         )
                     );
+
+                    logger.LogInformation($"Saving credits no.{i} to database");
+                    await db.SaveChangesAsync();
                 }
 
-                logger.LogInformation("Saving credits to database");
-                await db.SaveChangesAsync();
+                logger.LogInformation($"Built database in {DateTime.Now - startTime}");
             }
 
             // Configure the HTTP request pipeline.

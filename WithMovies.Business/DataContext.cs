@@ -15,6 +15,8 @@ namespace WithMovies.Business
         public DbSet<MovieCollection> MovieCollections { get; set; } = null!;
         public DbSet<ProductionCompany> ProductionCompanies { get; set; } = null!;
         public DbSet<RecommendationProfile> RecommendationProfiles { get; set; } = null!;
+        public DbSet<RecommendationProfileInput> RecommendationProfileInputs { get; set; } = null!;
+        public DbSet<WeightedMovie> WeightedMovies { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
 
         // Fake table, doesn't actually exist. This is used in KeywordService
@@ -55,6 +57,11 @@ namespace WithMovies.Business
                     v => string.Join(",", v.ToArray()),
                     v => string.IsNullOrWhiteSpace(v) ? new List<string?>() : v.Split(new[] { ',' })
                 );
+
+            modelBuilder
+                .Entity<RecommendationProfile>()
+                .Property(p => p.ExplicitelyLikedGenres)
+                .HasConversion(v => v.Cast<byte>().ToArray(), v => v.Cast<bool>().ToArray());
 
             modelBuilder.Entity<CastMember>().HasMany(m => m.Movies).WithMany(m => m.Cast);
             modelBuilder.Entity<CrewMember>().HasMany(m => m.Movies).WithMany(m => m.Crew);

@@ -18,7 +18,11 @@ namespace WithMovies.WebApi
             var builder = WebApplication.CreateBuilder(args);
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
+#if DEBUG
+            builder.Configuration.AddJsonFile("appsettings.Development.json");
+#else
             builder.Configuration.AddJsonFile("appsettings.json");
+#endif
 
             builder.Services.AddDbContext<DataContext>(
                 options => options.UseSqlite("Data Source=db.sqlite3;").UseLazyLoadingProxies()
@@ -35,9 +39,11 @@ namespace WithMovies.WebApi
             >();
             builder.Services.AddScoped<IProductionCompanyService, ProductionCompanyService>();
             builder.Services.AddScoped<IMovieCollectionService, MovieCollectionService>();
+            builder.Services.AddScoped<IRecommendationService, RecommendationService>();
             builder.Services.AddScoped<IKeywordService, SqliteKeywordService>();
             builder.Services.AddScoped<ICreditsService, CreditsService>();
             builder.Services.AddScoped<IMovieService, MovieService>();
+            builder.Services.AddHostedService<AlgorithmScheduler>();
             builder.Services.AddLogging(
                 x =>
                     x.ClearProviders()

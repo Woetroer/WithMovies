@@ -71,14 +71,13 @@ public class CreditsService : ICreditsService
             // await _dataContext.AddRangeAsync(credit.Crew);
 
             if (!movies.ContainsKey(credit.Id))
-                movies[credit.Id] = (await _movieService.GetById(credit.Id))!;
+                movies[credit.Id] = (await _dataContext.Movies.FindAsync(credit.Id))!;
 
             var movie = movies[credit.Id];
             movie.Cast = credit.Cast;
             movie.Crew = credit.Crew;
+            _dataContext.Update(movie);
         }
-
-        _dataContext.UpdateRange(movies.Values);
     }
 
     public async Task<List<CastMember>> CastGetFiveAsync()

@@ -37,5 +37,6 @@ namespace WithMovies.Domain.Models
         public virtual ICollection<CastMember> Cast { get; set; } = null!;
         public virtual ICollection<CrewMember> Crew { get; set; } = null!;
         public virtual ICollection<Review> Reviews { get; set; } = null!;
+        public virtual ICollection<Keyword> Keywords { get; set; } = null!;
     }
 }

@@ -53,7 +53,7 @@ public class CreditsService : ICreditsService
 
             if (iteration % 500 == 0)
             {
-                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
+                string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
                 _logger.LogInformation($"{progressBar} Adding credits");
             }
 
@@ -79,5 +79,11 @@ public class CreditsService : ICreditsService
         }
 
         _dataContext.UpdateRange(movies.Values);
+    }
+
+    public async Task<List<CastMember>> CastGetFiveAsync()
+    {
+        List<CastMember> result = await _dataContext.CastMembers.ToListAsync();
+        return result;
     }
 }

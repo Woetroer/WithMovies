@@ -7,7 +7,7 @@ namespace WithMovies.WebApi.Dtos
     public class MovieDto
     {
         public string? ImdbId { get; set; }
-        public virtual MovieCollection? BelongsToCollection { get; set; }
+        public virtual MovieCollectionDto? BelongsToCollection { get; set; }
         public string? Title { get; set; }
         public string? Tagline { get; set; }
         public string? OriginalLanguage { get; set; }
@@ -34,5 +34,6 @@ namespace WithMovies.WebApi.Dtos
         public double VoteAverage { get; set; }
         public int VoteCount { get; set; }
         public double Popularity { get; set; }
+        public ICollection<string> Keywords { get; set; }
     }
 }

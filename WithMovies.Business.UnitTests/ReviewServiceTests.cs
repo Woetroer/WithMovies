@@ -4,7 +4,7 @@ using WithMovies.Domain.Enums;
 
 namespace WithMovies.Business.UnitTests;
 
-[Collection("Dbtests")]
+[Collection("Database Tests")]
 public class ReviewServiceTests : UnitTestBase<IReviewService>
 {
     [Theory]

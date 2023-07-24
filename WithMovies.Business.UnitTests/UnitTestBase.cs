@@ -8,7 +8,7 @@ using WithMovies.Domain.Models;
 
 namespace WithMovies.Business.UnitTests;
 
-public abstract class UnitTestBase : IDisposable
+public abstract class UnitTestBase
 {
     protected IServiceProvider _services;
     private DataContext? _dataContext;
@@ -21,7 +21,7 @@ public abstract class UnitTestBase : IDisposable
             options =>
                 options
                     .UseSqlite(
-                        "Data Source=test-db.sqlite3;Cache=private",
+                        "Data Source=test.db;",
                         x => x.MigrationsAssembly("WithMovies.Business")
                     )
                     .UseLazyLoadingProxies()
@@ -52,25 +52,11 @@ public abstract class UnitTestBase : IDisposable
     private async Task TestStart()
     {
         _dataContext = _services.GetRequiredService<DataContext>();
+        await _dataContext.Database.EnsureDeletedAsync();
         await _dataContext.Database.EnsureCreatedAsync();
-
-        RemoveAll();
-        await _dataContext!.SaveChangesAsync();
 
         await SetupDatabase(_dataContext);
         await _dataContext.SaveChangesAsync();
-    }
-
-    private async Task TestEnd()
-    {
-        // await PreDisposeDatabase(_dataContext!);
-
-        // RemoveAll();
-
-        // await _dataContext!.SaveChangesAsync();
-        // await _dataContext!.DisposeAsync();
-
-        // await PostDisposeDatabase();
     }
 
     private void RemoveAll()
@@ -90,8 +76,6 @@ public abstract class UnitTestBase : IDisposable
     {
         _dataContext!.RemoveRange(_dataContext.Set<T>());
     }
-
-    public void Dispose() => Task.WaitAll(TestEnd());
 }
 
 public abstract class UnitTestBase<T> : UnitTestBase

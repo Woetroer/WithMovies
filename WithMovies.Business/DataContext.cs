@@ -68,7 +68,10 @@ namespace WithMovies.Business
             modelBuilder
                 .Entity<RecommendationProfile>()
                 .Property(p => p.ExplicitelyLikedGenres)
-                .HasConversion(v => v.Cast<byte>().ToArray(), v => v.Cast<bool>().ToArray());
+                .HasConversion(
+                    v => v != null ? v.Select(b => b ? (byte)1 : (byte)0).ToArray() : new byte[20],
+                    v => v != null ? v.Select(b => b != 0).ToArray() : new bool[20]
+                );
 
             modelBuilder.Entity<CastMember>().HasMany(m => m.Movies).WithMany(m => m.Cast);
             modelBuilder.Entity<CrewMember>().HasMany(m => m.Movies).WithMany(m => m.Crew);

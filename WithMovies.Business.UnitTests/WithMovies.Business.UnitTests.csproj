@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WithMovies.Data.Sqlite\WithMovies.Data.Sqlite.csproj" />
     <ProjectReference Include="..\WithMovies.Business\WithMovies.Business.csproj" />
     <ProjectReference Include="..\WithMovies.Domain\WithMovies.Domain.csproj" />
   </ItemGroup>

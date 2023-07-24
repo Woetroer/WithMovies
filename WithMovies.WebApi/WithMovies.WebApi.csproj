@@ -33,6 +33,7 @@
   <ItemGroup>
       <ProjectReference Include="../WithMovies.Business/WithMovies.Business.csproj" />
       <ProjectReference Include="../WithMovies.Domain/WithMovies.Domain.csproj" />
+      <ProjectReference Include="../WithMovies.Data.Sqlite/WithMovies.Data.Sqlite.csproj" />
   </ItemGroup>
 
 </Project>

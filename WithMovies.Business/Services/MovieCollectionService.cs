@@ -4,8 +4,8 @@ using WithMovies.Domain.Models;
 
 namespace WithMovies.Business.Services
 {
-	public class MovieCollectionService : IMovieCollectionService
-	{
+    public class MovieCollectionService : IMovieCollectionService
+    {
         private DataContext _dataContext;
 
         public MovieCollectionService(DataContext dataContext)
@@ -23,7 +23,12 @@ namespace WithMovies.Business.Services
             return _dataContext.MovieCollections.FirstOrDefaultAsync(c => c.Name == name);
         }
 
-        public async Task<MovieCollection> MovieCollectionCreateAsync(string name, string? posterPath = null, string? backdropPath = null, Movie[]? movies = null)
+        public async Task<MovieCollection> MovieCollectionCreateAsync(
+            string name,
+            string? posterPath = null,
+            string? backdropPath = null,
+            Movie[]? movies = null
+        )
         {
             var collection = new MovieCollection
             {
@@ -39,4 +44,3 @@ namespace WithMovies.Business.Services
         }
     }
 }
-

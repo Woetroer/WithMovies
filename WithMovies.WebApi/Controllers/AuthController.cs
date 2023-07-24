@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using WithMovies.Business;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Models;
 
@@ -15,50 +16,70 @@ namespace WithMovies.WebApi.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly DataContext _dataContext;
         private readonly IConfiguration _config;
 
-        public AuthController(UserManager<User> userManager, IConfiguration config, RoleManager<IdentityRole> roleManager)
+        public AuthController(
+            UserManager<User> userManager,
+            IConfiguration config,
+            RoleManager<IdentityRole> roleManager,
+            DataContext dataContext
+        )
         {
             _userManager = userManager;
             _config = config;
             _roleManager = roleManager;
+            _dataContext = dataContext;
         }
 
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] Login model)
         {
-            if (model == null) return BadRequest();
+            if (model == null)
+                return BadRequest();
+
             var user = await _userManager.FindByNameAsync(model.Username);
 
-            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password)) return Unauthorized();
+            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+                return Unauthorized();
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.NameIdentifier, user.Id!)
+            };
 
             var userRoles = await _userManager.GetRolesAsync(user);
 
-            var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName!),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id!)
-                };
+            foreach (var userRole in userRoles)
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
 
-
-            foreach (var userRole in userRoles) claims.Add(new Claim(ClaimTypes.Role, userRole));
-
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            var authSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+            );
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 expires: DateTime.Now.AddHours(3),
                 claims: claims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                signingCredentials: new SigningCredentials(
+                    authSigningKey,
+                    SecurityAlgorithms.HmacSha256
+                )
             );
 
-            return Ok(new
-            {
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                Expiration = token.ValidTo
-            });
+            user.LastLogin = DateTime.Now;
+            await _dataContext.SaveChangesAsync();
+
+            return Ok(
+                new
+                {
+                    Token = new JwtSecurityTokenHandler().WriteToken(token),
+                    Expiration = token.ValidTo
+                }
+            );
         }
 
         [HttpPost]
@@ -68,10 +89,16 @@ namespace WithMovies.WebApi.Controllers
             await CheckIfValid(model);
 
             var userByUsername = await _userManager.FindByNameAsync(model.Username);
-            if (userByUsername != null) return Conflict(new { Username = new List<string>() { "Username already exists" } });
+            if (userByUsername != null)
+            {
+                return Conflict(
+                    new { Username = new List<string>() { "Username already exists" } }
+                );
+            }
 
             var userByEmail = await _userManager.FindByEmailAsync(model.Email);
-            if (userByEmail != null) return Conflict(new { Email = new List<string>() { "Email already exists" } });
+            if (userByEmail != null)
+                return Conflict(new { Email = new List<string>() { "Email already exists" } });
 
             var user = new User
             {
@@ -80,13 +107,27 @@ namespace WithMovies.WebApi.Controllers
                 UserName = model.Username,
                 Friends = new List<User>(),
                 Watchlist = new List<Movie>(),
-                Reviews = new List<Review>()
+                Reviews = new List<Review>(),
+                LastLogin = DateTime.Now,
+                RecommendationProfile = new RecommendationProfile
+                {
+                    Inputs = new List<RecommendationProfileInput>(),
+                    ExplicitelyLikedGenres = new bool[20],
+                    MovieWeights = new List<WeightedMovie>(),
+                    GenreWeights = new float[20],
+                },
             };
 
             // Create user
             var result = await _userManager.CreateAsync(user, model.Password);
+
             if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, string.Join(';', result.Errors.Select(x => x.Description)));
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    string.Join(';', result.Errors.Select(x => x.Description))
+                );
+            }
 
             if (!await _roleManager.RoleExistsAsync(UserRoles.User))
                 await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
@@ -99,7 +140,8 @@ namespace WithMovies.WebApi.Controllers
 
         private async Task<IActionResult> CheckIfValid(Register model)
         {
-            if (model == null) return BadRequest();
+            if (model == null)
+                return BadRequest();
 
             var emailExists = await _userManager.FindByEmailAsync(model.Email!);
             if (emailExists != null)

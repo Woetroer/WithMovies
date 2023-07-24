@@ -15,7 +15,19 @@ namespace WithMovies.Business.Services
         private DataContext _dataContext;
         private ILogger<MovieService> _logger;
 
-        public async Task Create(User user, Movie movie, int rating, string? message, DateTime postedTime)
+        public ReviewService(DataContext dataContext, ILogger<MovieService> logger)
+        {
+            _dataContext = dataContext;
+            _logger = logger;
+        }
+
+        public async Task Create(
+            User user,
+            Movie movie,
+            int rating,
+            string? message,
+            DateTime postedTime
+        )
         {
             Review reviewToAdd = new Review()
             {
@@ -29,9 +41,11 @@ namespace WithMovies.Business.Services
             await _dataContext.SaveChangesAsync();
         }
 
-        public async Task<Review> Read(int id) => await _dataContext.Reviews.FirstOrDefaultAsync(p => p.Id == id);
-        
-        public async Task<List<Review>> ReadAll(int movieId) => await _dataContext.Reviews.Where(m => m.Id == movieId).ToListAsync();
+        public async Task<Review?> Read(int id) =>
+            await _dataContext.Reviews.FirstOrDefaultAsync(p => p.Id == id);
+
+        public async Task<List<Review>> ReadAll(int movieId) =>
+            await _dataContext.Reviews.Where(m => m.Id == movieId).ToListAsync();
 
         public async Task Update(Review review)
         {

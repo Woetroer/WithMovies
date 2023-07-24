@@ -6,8 +6,6 @@ using System.Security.Policy;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Models;
 
-
-
 namespace WithMovies.Business.UnitTests
 {
     public class DatabaseUtilities
@@ -24,7 +22,6 @@ namespace WithMovies.Business.UnitTests
         public MovieCollection TestMovieCollection1 { get; set; }
         public MovieCollection TestMovieCollection2 { get; set; }
 
-
         public Review TestReview1 { get; set; }
         public Review TestReview2 { get; set; }
         public Review TestReview3 { get; set; }
@@ -33,19 +30,22 @@ namespace WithMovies.Business.UnitTests
         public CrewMember TestCrewmember1 { get; set; }
         public ProductionCompany TestCompany1 { get; set; }
 
-
         public Keyword TestKeyword1 { get; set; }
         public RecommendationProfile TestRecommendation1 { get; set; }
 
-
         private DataContext _dataContext { get; set; }
+
         public DatabaseUtilities()
         {
-            _dataContext = new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlite("Data Source=test-db.sqlite").UseLazyLoadingProxies().Options);
+            _dataContext = new DataContext(
+                new DbContextOptionsBuilder<DataContext>()
+                    .UseSqlite("Data Source=test-db.sqlite")
+                    .UseLazyLoadingProxies()
+                    .Options
+            );
 
             SetValues();
         }
-
 
         private void SetValues()
         {
@@ -68,18 +68,18 @@ namespace WithMovies.Business.UnitTests
                 Tagline = "Lets test!",
                 OriginalLanguage = "english",
                 OriginalTitle = "TestMovie1",
-                Adult = true, 
+                Adult = true,
                 Overview = "First Tester",
                 Budget = 1200000,
-                Genres = new List<Genre>() { Genre.Adventure, Genre.Mystery},
+                Genres = new List<Genre>() { Genre.Adventure, Genre.Mystery },
                 HomePage = "HomePage1",
                 PosterPath = "PosertPage1",
-                ProductionCompanies = new List<ProductionCompany>() {TestCompany1},
-                ProductionCountries = new List<string>() {"Atlantis", "Babylon"},
+                ProductionCompanies = new List<ProductionCompany>() { TestCompany1 },
+                ProductionCountries = new List<string>() { "Atlantis", "Babylon" },
                 ReleaseDate = new DateTime(),
                 Revenue = 20000000,
                 Runtime = new TimeSpan(),
-                SpokenLanguages = new List<string>() {"english", "italian" },
+                SpokenLanguages = new List<string>() { "english", "italian" },
                 Status = MovieStatus.Released,
                 VoteAverage = 3.10,
                 VoteCount = 200,
@@ -191,7 +191,7 @@ namespace WithMovies.Business.UnitTests
                 Adult = true,
                 Overview = "Fith Tester",
                 Budget = 1270000,
-                Genres = new List<Genre>() { Genre.Adventure},
+                Genres = new List<Genre>() { Genre.Adventure },
                 HomePage = "HomePage5",
                 PosterPath = "PosertPage5",
                 ProductionCompanies = new List<ProductionCompany>() { TestCompany1 },
@@ -234,10 +234,9 @@ namespace WithMovies.Business.UnitTests
                 VoteAverage = 3.10,
                 VoteCount = 200,
                 Popularity = 4.23,
-                Cast = new List<CastMember>() { TestCastmember1},
-                Crew = new List<CrewMember>() { TestCrewmember1},
+                Cast = new List<CastMember>() { TestCastmember1 },
+                Crew = new List<CrewMember>() { TestCrewmember1 },
                 Reviews = new List<Review>() { TestReview1, TestReview2, TestReview3 }
-
             };
 
             TestMovieCollection1 = new MovieCollection
@@ -246,7 +245,7 @@ namespace WithMovies.Business.UnitTests
                 Name = "Collection1:OG's",
                 Id = 1,
                 PosterPath = "PosterPath11",
-                Movies = new List<Movie>{TestMovie1, TestMovie2, TestMovie3, TestMovie4}
+                Movies = new List<Movie> { TestMovie1, TestMovie2, TestMovie3, TestMovie4 }
             };
 
             TestMovieCollection2 = new MovieCollection
@@ -255,7 +254,7 @@ namespace WithMovies.Business.UnitTests
                 Name = "Collection2:ElectricBoogaluu",
                 Id = 2,
                 PosterPath = "PosterPath12",
-                Movies = new List<Movie>{TestMovie5, TestMovie6}
+                Movies = new List<Movie> { TestMovie5, TestMovie6 }
             };
 
             TestReview1 = new Review
@@ -311,22 +310,20 @@ namespace WithMovies.Business.UnitTests
                 ProfilePath = "ProfilePath2"
             };
 
-            TestCompany1 = new ProductionCompany
-            {
-                Id = 0,
-                Name =  "TestCompany"
-            };
+            TestCompany1 = new ProductionCompany { Id = 0, Name = "TestCompany" };
 
             TestKeyword1 = new Keyword
             {
                 Id = 0,
                 Name = "TestKeyword",
-                Movies = new List<Movie>() { TestMovie1, TestMovie2, TestMovie5, TestMovie6}
+                Movies = new List<Movie>() { TestMovie1, TestMovie2, TestMovie5, TestMovie6 }
             };
 
             TestRecommendation1 = new RecommendationProfile
             {
-                Id = 0
+                Id = 0,
+                ExplicitelyLikedGenres = new bool[20],
+                GenreWeights = new float[20],
             };
         }
 
@@ -359,7 +356,6 @@ namespace WithMovies.Business.UnitTests
 
             await _dataContext.AddAsync(TestKeyword1);
             await _dataContext.AddAsync(TestRecommendation1);
-
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WithMovies.Business;
 
@@ -10,9 +11,11 @@ using WithMovies.Business;
 namespace WithMovies.Business.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230722120244_NullabilityChecks")]
+    partial class NullabilityChecks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -308,10 +311,6 @@ namespace WithMovies.Business.Migrations
                     b.Property<int?>("KeywordId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Keywords")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("OriginalLanguage")
                         .HasColumnType("TEXT");
 
@@ -419,46 +418,9 @@ namespace WithMovies.Business.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("ExplicitelyLikedGenres")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
-
                     b.HasKey("Id");
 
                     b.ToTable("RecommendationProfiles");
-                });
-
-            modelBuilder.Entity("WithMovies.Domain.Models.RecommendationProfileInput", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ParentId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double?>("Rating")
-                        .HasColumnType("REAL");
-
-                    b.Property<bool>("ViewedDetailsPage")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Watched")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MovieId");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("RecommendationProfileInputs");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.Review", b =>
@@ -511,9 +473,6 @@ namespace WithMovies.Business.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("LastLogin")
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
 
@@ -535,9 +494,6 @@ namespace WithMovies.Business.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RecommendationProfileId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("SecurityStamp")
@@ -562,33 +518,9 @@ namespace WithMovies.Business.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.HasIndex("RecommendationProfileId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("WithMovies.Domain.Models.WeightedMovie", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ParentId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<float>("Weight")
-                        .HasColumnType("REAL");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("WeightedMovies");
                 });
 
             modelBuilder.Entity("CastMemberMovie", b =>
@@ -704,25 +636,6 @@ namespace WithMovies.Business.Migrations
                     b.Navigation("BelongsToCollection");
                 });
 
-            modelBuilder.Entity("WithMovies.Domain.Models.RecommendationProfileInput", b =>
-                {
-                    b.HasOne("WithMovies.Domain.Models.Movie", "Movie")
-                        .WithMany()
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WithMovies.Domain.Models.RecommendationProfile", "Parent")
-                        .WithMany("Inputs")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Movie");
-
-                    b.Navigation("Parent");
-                });
-
             modelBuilder.Entity("WithMovies.Domain.Models.Review", b =>
                 {
                     b.HasOne("WithMovies.Domain.Models.User", "Author")
@@ -744,28 +657,9 @@ namespace WithMovies.Business.Migrations
 
             modelBuilder.Entity("WithMovies.Domain.Models.User", b =>
                 {
-                    b.HasOne("WithMovies.Domain.Models.RecommendationProfile", "RecommendationProfile")
-                        .WithMany()
-                        .HasForeignKey("RecommendationProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WithMovies.Domain.Models.User", null)
                         .WithMany("Friends")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("RecommendationProfile");
-                });
-
-            modelBuilder.Entity("WithMovies.Domain.Models.WeightedMovie", b =>
-                {
-                    b.HasOne("WithMovies.Domain.Models.RecommendationProfile", "Parent")
-                        .WithMany("MovieWeights")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.Keyword", b =>
@@ -781,13 +675,6 @@ namespace WithMovies.Business.Migrations
             modelBuilder.Entity("WithMovies.Domain.Models.MovieCollection", b =>
                 {
                     b.Navigation("Movies");
-                });
-
-            modelBuilder.Entity("WithMovies.Domain.Models.RecommendationProfile", b =>
-                {
-                    b.Navigation("Inputs");
-
-                    b.Navigation("MovieWeights");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.User", b =>

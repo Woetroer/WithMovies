@@ -38,6 +38,6 @@ public class RecommendationService : IRecommendationService
 
         var duration = DateTime.Now - startTime;
 
-        _logger.LogInformation($"Recommendation engine run took {duration.TotalSeconds:.4f}s");
+        _logger.LogInformation($"Recommendation engine run took {duration.TotalSeconds:N4}");
     }
 }

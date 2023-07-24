@@ -95,5 +95,17 @@ public class RecommendationEngine
                     _movieWeights[pair.Key] = pair.Value;
             }
         }
+
+        var max = _genreWeights.Max();
+        for (int i = 0; i < _genreWeights.Length; i++)
+        {
+            _genreWeights[i] = _genreWeights[i] / max;
+        }
+
+        max = _movieWeights.Values.Max();
+        foreach (var pair in _movieWeights)
+        {
+            _movieWeights[pair.Key] /= max;
+        }
     }
 }

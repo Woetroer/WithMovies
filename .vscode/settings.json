@@ -12,5 +12,8 @@
     "sqlfluff.dialect": "sqlite",
     "sqlfluff.suppressNotifications": true,
     "sqlfluff.config": ".sqlfluff",
-    "sqlfluff.linter.run": "off"
+    "sqlfluff.linter.run": "off",
+    "[csharp]": {
+        "editor.maxTokenizationLineLength": 2500
+    }
 }

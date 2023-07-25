@@ -1,4 +1,16 @@
-﻿namespace WithMovies.WebApi.Controllers
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using WithMovies.Business;
+using WithMovies.Domain.Models;
+using WithMovies.WebApi.Models;
+
+namespace WithMovies.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -8,7 +20,6 @@
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly DataContext _dataContext;
         private readonly IConfiguration _config;
-        private readonly DataContext _dataContext;
 
         public AuthController(UserManager<User> userManager, IConfiguration config, RoleManager<IdentityRole> roleManager, DataContext dataContext)
         {

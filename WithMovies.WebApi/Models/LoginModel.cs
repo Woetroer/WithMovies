@@ -2,7 +2,7 @@
 
 namespace WithMovies.WebApi.Models
 {
-    public class Login
+    public class LoginModel
     {
         [Required(ErrorMessage = "User Name is required")]
         public required string Username { get; set; }

@@ -19,6 +19,7 @@ namespace WithMovies.WebApi.Controllers
         [HttpPut("change-username/{newUsername}"), Authorize]
         public async Task<IActionResult> ChangeUsername(string newUsername)
         {
+            if (newUsername == null) return BadRequest("The new username cannot be empty");
             User? user = await _userManager.FindByIdAsync(UserId);
             if (user == null) return BadRequest("User Not Found!");
             if (user.UserName == newUsername) return BadRequest("The new username should be unique");
@@ -33,6 +34,7 @@ namespace WithMovies.WebApi.Controllers
         [HttpPut("change-email/{newEmail}"), Authorize]
         public async Task<IActionResult> ChangeEmail(string newEmail)
         {
+            if (newEmail == null) return BadRequest("The new email cannot be empty");
             User? user = await _userManager.FindByIdAsync(UserId);
             if (user == null) return BadRequest("User Not Found!");
             if (user.Email == newEmail) return BadRequest("The new email should be unique");

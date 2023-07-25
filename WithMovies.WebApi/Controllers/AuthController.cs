@@ -31,7 +31,7 @@ namespace WithMovies.WebApi.Controllers
 
         public class AuthenticatedResponse
         {
-            public string? Token { get; set; }
+            public string? AccessToken { get; set; }
             public string? RefreshToken { get; set; }
         }
 
@@ -54,7 +54,7 @@ namespace WithMovies.WebApi.Controllers
 
             return Ok(new AuthenticatedResponse
             {
-                Token = accessToken,
+                AccessToken = accessToken,
                 RefreshToken = refreshToken
             });
         }
@@ -137,7 +137,7 @@ namespace WithMovies.WebApi.Controllers
 
             return Ok(new AuthenticatedResponse()
             {
-                Token = newAccessToken,
+                AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken
             });
         }
@@ -150,7 +150,7 @@ namespace WithMovies.WebApi.Controllers
             User? user = await _userManager.FindByIdAsync(UserId);
             if (user == null) return BadRequest();
 
-            user.RefreshToken = null;
+            user.RefreshToken = string.Empty;
             await _dataContext.SaveChangesAsync();
             return Ok();
         }
@@ -192,15 +192,15 @@ namespace WithMovies.WebApi.Controllers
             }
         }
 
-        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
+                ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)),
-                ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
+                ValidateLifetime = false // here we are saying that we don't care about the token's expiration date
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken securityToken;

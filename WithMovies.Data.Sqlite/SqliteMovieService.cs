@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
@@ -42,24 +44,23 @@ namespace WithMovies.Business.Services
         public required int VoteCount { get; set; }
     }
 
-    public class MovieService : IMovieService
+    public class SqliteMovieService : IMovieService
     {
-        private IMovieCollectionService _movieCollectionService;
-        private IProductionCompanyService _productionCompanyService;
-        private DataContext _dataContext;
-        private ILogger<MovieService> _logger;
+        private readonly DataContext _dataContext;
+        private readonly ILogger<SqliteMovieService> _logger;
+        private readonly IMovieCollectionService _movieCollectionService;
+        private readonly IDatabaseExtensionsLoaderService _extensionsLoaderService;
 
-        public MovieService(
+        public SqliteMovieService(
             DataContext dataContext,
             IMovieCollectionService movieCollectionService,
-            IProductionCompanyService productionCompanyService,
-            ILogger<MovieService> logger
-        )
+            ILogger<SqliteMovieService> logger,
+            IDatabaseExtensionsLoaderService extensionsLoaderService)
         {
+            _logger = logger;
             _dataContext = dataContext;
             _movieCollectionService = movieCollectionService;
-            _productionCompanyService = productionCompanyService;
-            _logger = logger;
+            _extensionsLoaderService = extensionsLoaderService;
         }
 
         public async Task ImportJsonAsync(Stream json)
@@ -163,9 +164,41 @@ namespace WithMovies.Business.Services
             await _dataContext.AddRangeAsync(movies);
         }
 
-        public Task<Movie?> GetById(int movieId) => _dataContext.Movies.Include(m => m.Keywords).FirstOrDefaultAsync(m => m.Id == movieId);
+        public Task<Movie?> GetById(int movieId) =>
+            _dataContext.Movies.Include(m => m.Keywords).FirstOrDefaultAsync(m => m.Id == movieId);
 
-        public Task<List<Movie>> GetPopularMovies() =>
-            _dataContext.Movies.OrderByDescending(movie => movie.VoteCount).Take(50).ToListAsync();
+        public async Task<IQueryable<Movie>> GetTrending(int start, int limit)
+        {
+            await _extensionsLoaderService.EnsureLoaded("math");
+
+            return _dataContext.Movies.FromSqlRaw(
+                """
+                SELECT * FROM Movies
+                ORDER BY pow(VoteCount, VoteAverage) DESC
+                LIMIT :limit
+                OFFSET :start
+                """,
+                new SqliteParameter(":start", start),
+                new SqliteParameter(":limit", limit)
+            );
+        }
+
+        public async Task<IQueryable<Movie>> GetTrending(User user, int start, int limit) =>
+            _dataContext.Movies.FromSqlRaw(
+                """
+                SELECT (Id, Title, Tagline, PosterPath, VoteAverage, VoteCount) FROM Movies
+                
+                """
+            );
+
+        public async Task<IQueryable<Movie>> GetFriendMovies(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IQueryable<Movie>> GetWatchList(User user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

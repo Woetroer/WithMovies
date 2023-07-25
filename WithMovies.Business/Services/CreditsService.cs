@@ -18,11 +18,11 @@ public class CreditsService : ICreditsService
 {
     private DataContext _dataContext;
     private IMovieService _movieService;
-    private ILogger<MovieService> _logger;
+    private ILogger<ICreditsService> _logger;
 
     public CreditsService(
         DataContext dataContext,
-        ILogger<MovieService> logger,
+        ILogger<ICreditsService> logger,
         IMovieService movieService
     )
     {

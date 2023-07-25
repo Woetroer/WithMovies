@@ -34,7 +34,7 @@ public abstract class UnitTestBase
         collection.AddScoped<IMovieCollectionService, MovieCollectionService>();
         collection.AddScoped<IKeywordService, SqliteKeywordService>();
         collection.AddScoped<IReviewService, ReviewService>();
-        collection.AddScoped<IMovieService, MovieService>();
+        collection.AddScoped<IMovieService, SqliteMovieService>();
         collection.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DataContext>();
         collection.AddLogging();
 

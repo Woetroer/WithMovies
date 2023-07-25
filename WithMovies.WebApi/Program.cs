@@ -1,14 +1,14 @@
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using WithMovies.Business;
 using WithMovies.Business.Services;
+using WithMovies.Data.Sqlite;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
-using WithMovies.Data.Sqlite;
 
 namespace WithMovies.WebApi
 {
@@ -92,7 +92,7 @@ namespace WithMovies.WebApi
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
-                                  policy => policy.WithOrigins("http://localhost:4200")
+                                  policy => policy.WithOrigins("http://localhost:4200", "http://192.168.2.60:4200")
                                                   .AllowAnyHeader()
                                                   .AllowAnyMethod()
                                                   .AllowCredentials());

@@ -43,7 +43,7 @@ namespace WithMovies.WebApi.Controllers
         [HttpGet("movie/{id}")]
         public async Task<IActionResult> ReadReviews(int id)
         {
-            List<ReviewDto> dto = new List<ReviewDto>();
+            List<ReviewDto> dto = new();
             List<Review> reviews = await _reviewService.ReadAll(id);
             foreach (Review review in reviews)
                 dto.Add(review.ToDto());

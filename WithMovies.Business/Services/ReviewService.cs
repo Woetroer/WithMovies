@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WithMovies.Domain.Models;
-using WithMovies.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using WithMovies.Domain.Interfaces;
+using WithMovies.Domain.Models;
 
 namespace WithMovies.Business.Services
 {
@@ -29,7 +29,7 @@ namespace WithMovies.Business.Services
             DateTime postedTime
         )
         {
-            Review reviewToAdd = new Review()
+            var reviewToAdd = new Review
             {
                 Author = user,
                 Movie = movie,
@@ -37,20 +37,24 @@ namespace WithMovies.Business.Services
                 Message = message,
                 PostedTime = postedTime
             };
-            await _dataContext.Reviews.AddAsync(reviewToAdd);
+
+            movie.VoteAverage = ((movie.VoteAverage * movie.VoteCount) + rating) / ++movie.VoteCount;
+
+            _dataContext.Update(movie);
+            await _dataContext.AddAsync(reviewToAdd);
             await _dataContext.SaveChangesAsync();
         }
 
-        public async Task<Review?> Read(int id) =>
-            await _dataContext.Reviews.FirstOrDefaultAsync(p => p.Id == id);
+        public Task<Review?> Read(int id) =>
+            _dataContext.Reviews.FindAsync(id).AsTask();
 
-        public async Task<List<Review>> ReadAll(int movieId) =>
-            await _dataContext.Reviews.Where(m => m.Id == movieId).ToListAsync();
+        public Task<List<Review>> ReadAll(int movieId) =>
+            _dataContext.Reviews.Where(m => m.Id == movieId).ToListAsync();
 
         public async Task Update(Review review)
         {
             _dataContext.Reviews.Update(review);
-            
+
             await _dataContext.SaveChangesAsync();
         }
 
@@ -58,7 +62,7 @@ namespace WithMovies.Business.Services
         {
             if (await Read(id) is Review review)
                 _dataContext.Remove(review);
-            
+
             await _dataContext.SaveChangesAsync();
         }
     }

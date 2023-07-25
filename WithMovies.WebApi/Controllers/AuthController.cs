@@ -43,7 +43,7 @@
             user.RefreshTokenExpiry = DateTime.Now.AddDays(7);
 
             user.LastLogin = DateTime.Now;
-            _dataContext.SaveChanges();
+            await _dataContext.SaveChanges();
 
             return Ok(new AuthenticatedResponse
             {

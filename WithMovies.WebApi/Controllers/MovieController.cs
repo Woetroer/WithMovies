@@ -27,9 +27,9 @@ namespace WithMovies.WebApi.Controllers
         [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetById(int id)
         {
-            MovieDto movieToReturn = (await _movieService.GetById(id)).ToDto();
+            var movieToReturn = await _movieService.GetById(id);
             if (movieToReturn == null) { return NotFound(); }
-            return Ok(movieToReturn);
+            return Ok(movieToReturn.ToDto());
         }
     }
 }

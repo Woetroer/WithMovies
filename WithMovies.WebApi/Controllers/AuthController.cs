@@ -1,16 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using WithMovies.Business;
-using WithMovies.Domain.Models;
-using WithMovies.WebApi.Models;
-
-namespace WithMovies.WebApi.Controllers
+﻿namespace WithMovies.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,6 +6,7 @@ namespace WithMovies.WebApi.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly DataContext _dataContext;
         private readonly IConfiguration _config;
         private readonly DataContext _dataContext;
 
@@ -39,10 +28,13 @@ namespace WithMovies.WebApi.Controllers
         [Route("login")]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            if (model == null) return BadRequest();
+            if (model == null)
+                return BadRequest();
+
             var user = await _userManager.FindByNameAsync(model.Username);
 
-            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password)) return Unauthorized();
+            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+                return Unauthorized();
 
             var accessToken = await GenerateAccessToken(user);
             var refreshToken = GenerateRefreshToken();
@@ -50,6 +42,7 @@ namespace WithMovies.WebApi.Controllers
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = DateTime.Now.AddDays(7);
 
+            user.LastLogin = DateTime.Now;
             _dataContext.SaveChanges();
 
             return Ok(new AuthenticatedResponse
@@ -66,10 +59,16 @@ namespace WithMovies.WebApi.Controllers
             await CheckIfValid(model);
 
             var userByUsername = await _userManager.FindByNameAsync(model.Username);
-            if (userByUsername != null) return Conflict(new { Username = new List<string>() { "Username already exists" } });
+            if (userByUsername != null)
+            {
+                return Conflict(
+                    new { Username = new List<string>() { "Username already exists" } }
+                );
+            }
 
             var userByEmail = await _userManager.FindByEmailAsync(model.Email);
-            if (userByEmail != null) return Conflict(new { Email = new List<string>() { "Email already exists" } });
+            if (userByEmail != null)
+                return Conflict(new { Email = new List<string>() { "Email already exists" } });
 
             var user = new User
             {
@@ -78,13 +77,27 @@ namespace WithMovies.WebApi.Controllers
                 UserName = model.Username,
                 Friends = new List<User>(),
                 Watchlist = new List<Movie>(),
-                Reviews = new List<Review>()
+                Reviews = new List<Review>(),
+                LastLogin = DateTime.Now,
+                RecommendationProfile = new RecommendationProfile
+                {
+                    Inputs = new List<RecommendationProfileInput>(),
+                    ExplicitelyLikedGenres = new bool[20],
+                    MovieWeights = new List<WeightedMovie>(),
+                    GenreWeights = new float[20],
+                },
             };
 
             // Create user
             var result = await _userManager.CreateAsync(user, model.Password);
+
             if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, string.Join(';', result.Errors.Select(x => x.Description)));
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    string.Join(';', result.Errors.Select(x => x.Description))
+                );
+            }
 
             if (!await _roleManager.RoleExistsAsync(UserRoles.User))
                 await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
@@ -97,7 +110,8 @@ namespace WithMovies.WebApi.Controllers
 
         private async Task<IActionResult> CheckIfValid(RegisterModel model)
         {
-            if (model == null) return BadRequest();
+            if (model == null)
+                return BadRequest();
 
             var emailExists = await _userManager.FindByEmailAsync(model.Email!);
             if (emailExists != null)

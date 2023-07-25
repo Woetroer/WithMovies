@@ -4,14 +4,14 @@ using WithMovies.Domain.Models;
 
 namespace WithMovies.Business.Services
 {
-	public class ProductionCompanyService : IProductionCompanyService
-	{
+    public class ProductionCompanyService : IProductionCompanyService
+    {
         private DataContext _dataContext;
 
-		public ProductionCompanyService(DataContext dataContext)
-		{
+        public ProductionCompanyService(DataContext dataContext)
+        {
             _dataContext = dataContext;
-		}
+        }
 
         public async Task<ProductionCompany> ProductionCompanyCreateAsync(string name)
         {
@@ -51,4 +51,3 @@ namespace WithMovies.Business.Services
             _dataContext.ProductionCompanies.FirstOrDefaultAsync(c => c.Name == name);
     }
 }
-

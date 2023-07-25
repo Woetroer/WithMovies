@@ -15,8 +15,7 @@ public class RecommendationEngine
         get
         {
             // If the inputs have been queried before, use the last results
-            if (__inputs == null)
-                __inputs = _target!.Inputs.ToArray();
+            __inputs ??= _target!.Inputs.ToArray();
 
             return __inputs;
         }
@@ -96,13 +95,13 @@ public class RecommendationEngine
             }
         }
 
-        var max = _genreWeights.Max();
+        var max = _genreWeights.Append(0.01f).Max();
         for (int i = 0; i < _genreWeights.Length; i++)
         {
             _genreWeights[i] = _genreWeights[i] / max;
         }
 
-        max = _movieWeights.Values.Max();
+        max = _movieWeights.Values.Append(0.01f).Max();
         foreach (var pair in _movieWeights)
         {
             _movieWeights[pair.Key] /= max;

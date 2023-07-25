@@ -183,13 +183,29 @@ namespace WithMovies.Business.Services
             );
         }
 
-        public async Task<IQueryable<Movie>> GetTrending(User user, int start, int limit) =>
-            _dataContext.Movies.FromSqlRaw(
+        public async Task<IQueryable<Movie>> GetTrending(User user, int start, int limit)
+        {
+            await _extensionsLoaderService.EnsureLoaded("math");
+
+            return _dataContext.Movies.FromSqlRaw(
                 """
-                SELECT (Id, Title, Tagline, PosterPath, VoteAverage, VoteCount) FROM Movies
-                
-                """
+                SELECT *,
+                       (
+                           SELECT Weight
+                           FROM WeightedMovies
+                           WHERE WeightedMovies.ParentId = :rProfileId
+                           AND WeightedMovies.MovieId = Movies.Id
+                        ) AS Weight
+                FROM Movies
+                ORDER BY pow(VoteCount, VoteAverage) * Weight * Weight DESC
+                LIMIT :limit
+                OFFSET :start
+                """,
+                new SqliteParameter(":rProfileId", user.RecommendationProfile.Id),
+                new SqliteParameter(":start", start),
+                new SqliteParameter(":limit", limit)
             );
+        }
 
         public async Task<IQueryable<Movie>> GetFriendMovies(User user)
         {

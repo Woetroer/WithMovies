@@ -1,4 +1,10 @@
-﻿namespace WithMovies.WebApi.Controllers
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using WithMovies.Business;
+using WithMovies.Domain.Models;
+using WithMovies.WebApi.Models;
+
+namespace WithMovies.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

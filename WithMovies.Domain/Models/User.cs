@@ -1,4 +1,6 @@
-﻿namespace WithMovies.Domain.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace WithMovies.Domain.Models
 {
     public class User : IdentityUser
     {

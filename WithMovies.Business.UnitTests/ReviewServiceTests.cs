@@ -1,6 +1,6 @@
+using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
-using WithMovies.Domain.Enums;
 
 namespace WithMovies.Business.UnitTests;
 
@@ -59,7 +59,8 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
         context.Add(movie);
         context.Add(author);
 
-        context.Add(new Review {
+        context.Add(new Review
+        {
             Id = 1,
             Author = author,
             Rating = 4.7,
@@ -68,7 +69,8 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
             Movie = movie,
         });
 
-        context.Add(new Review {
+        context.Add(new Review
+        {
             Id = 2,
             Author = author,
             Rating = 4.3,
@@ -77,7 +79,8 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
             Movie = movie,
         });
 
-        context.Add(new Review {
+        context.Add(new Review
+        {
             Id = 3,
             Author = author,
             Rating = 3.4,

@@ -54,7 +54,7 @@ namespace WithMovies.WebApi.Controllers
             user.RefreshTokenExpiry = DateTime.Now.AddDays(7);
 
             user.LastLogin = DateTime.Now;
-            await _dataContext.SaveChanges();
+            await _dataContext.SaveChangesAsync();
 
             return Ok(new AuthenticatedResponse
             {

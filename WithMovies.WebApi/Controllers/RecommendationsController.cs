@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyModel;
+using WithMovies.Business.Services;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Models;
@@ -14,9 +15,10 @@ namespace WithMovies.WebApi.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
-        public RecommendationsController(UserManager<User> userManager)
+        public RecommendationsController(UserManager<User> userManager, IUserService userService)
         {
             _userManager = userManager;
+            _userService = userService;
         }
 
         [Route("recommendation/preferences")]

@@ -55,7 +55,8 @@ namespace WithMovies.Business.Services
             DataContext dataContext,
             IMovieCollectionService movieCollectionService,
             ILogger<SqliteMovieService> logger,
-            IDatabaseExtensionsLoaderService extensionsLoaderService)
+            IDatabaseExtensionsLoaderService extensionsLoaderService
+        )
         {
             _logger = logger;
             _dataContext = dataContext;
@@ -117,7 +118,7 @@ namespace WithMovies.Business.Services
 
                 if (iteration % 500 == 0)
                 {
-                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
                     _logger.LogInformation($"{progressBar} Adding movies");
                 }
 
@@ -195,7 +196,7 @@ namespace WithMovies.Business.Services
                            FROM WeightedMovies
                            WHERE WeightedMovies.ParentId = :rProfileId
                            AND WeightedMovies.MovieId = Movies.Id
-                        ) AS Weight
+                       ) AS Weight
                 FROM Movies
                 ORDER BY pow(VoteCount, VoteAverage) * Weight * Weight DESC
                 LIMIT :limit

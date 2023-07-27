@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using WithMovies.Business;
-using WithMovies.Domain.Models;
-using WithMovies.WebApi.Models;
-
-namespace WithMovies.WebApi.Controllers
+﻿namespace WithMovies.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -14,7 +8,6 @@ namespace WithMovies.WebApi.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly DataContext _dataContext;
         private readonly IConfiguration _config;
-        private readonly DataContext _dataContext;
 
         public AuthController(UserManager<User> userManager, IConfiguration config, RoleManager<IdentityRole> roleManager, DataContext dataContext)
         {
@@ -49,7 +42,7 @@ namespace WithMovies.WebApi.Controllers
             user.RefreshTokenExpiry = DateTime.Now.AddDays(7);
 
             user.LastLogin = DateTime.Now;
-            await _dataContext.SaveChanges();
+            await _dataContext.SaveChangesAsync();
 
             return Ok(new AuthenticatedResponse
             {
@@ -140,7 +133,7 @@ namespace WithMovies.WebApi.Controllers
             string refreshToken = tokenApiModel.RefreshToken;
 
             var principal = GetPrincipalFromExpiredToken(tokenApiModel.AccessToken);
-            var username = principal.Identity.Name;
+            var username = principal.Identity!.Name;
 
             var user = _userManager.Users.SingleOrDefault(u => u.UserName == username);
             if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTime.Now)
@@ -223,10 +216,8 @@ namespace WithMovies.WebApi.Controllers
                 ValidateLifetime = false // here we are saying that we don't care about the token's expiration date
             };
             var tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken securityToken;
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
-            var jwtSecurityToken = securityToken as JwtSecurityToken;
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 throw new SecurityTokenException("Invalid token");
             return principal;
         }

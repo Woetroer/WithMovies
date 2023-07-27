@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -21,7 +21,12 @@ namespace WithMovies.WebApi.Controllers
         private readonly DataContext _dataContext;
         private readonly IConfiguration _config;
 
-        public AuthController(UserManager<User> userManager, IConfiguration config, RoleManager<IdentityRole> roleManager, DataContext dataContext)
+        public AuthController(
+            UserManager<User> userManager,
+            IConfiguration config,
+            RoleManager<IdentityRole> roleManager,
+            DataContext dataContext
+        )
         {
             _userManager = userManager;
             _config = config;
@@ -56,11 +61,9 @@ namespace WithMovies.WebApi.Controllers
             user.LastLogin = DateTime.Now;
             await _dataContext.SaveChangesAsync();
 
-            return Ok(new AuthenticatedResponse
-            {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            });
+            return Ok(
+                new AuthenticatedResponse { AccessToken = accessToken, RefreshToken = refreshToken }
+            );
         }
 
         [HttpPost]
@@ -139,20 +142,28 @@ namespace WithMovies.WebApi.Controllers
         [Route("refresh")]
         public async Task<IActionResult> Refresh(TokenApiModel tokenApiModel)
         {
-            if (tokenApiModel.RefreshToken == null) return BadRequest("Refresh token is null!");
-            if (tokenApiModel.AccessToken == null) return BadRequest("Access Token is null!");
+            if (tokenApiModel.RefreshToken == null)
+                return BadRequest("Refresh token is null!");
+            if (tokenApiModel.AccessToken == null)
+                return BadRequest("Access Token is null!");
 
             string refreshToken = tokenApiModel.RefreshToken;
 
             var principal = GetPrincipalFromExpiredToken(tokenApiModel.AccessToken);
-            var username = principal.Identity.Name;
+            var username = principal.Identity!.Name;
 
             var user = _userManager.Users.SingleOrDefault(u => u.UserName == username);
-            if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTime.Now)
+            if (
+                user is null
+                || user.RefreshToken != refreshToken
+                || user.RefreshTokenExpiry <= DateTime.Now
+            )
                 return BadRequest("Invalid client request");
 
-            if (user.RefreshToken != refreshToken) return BadRequest("Invalid refresh token!");
-            if (user.RefreshTokenExpiry < DateTime.Now) return BadRequest("The refresh token is expired!");
+            if (user.RefreshToken != refreshToken)
+                return BadRequest("Invalid refresh token!");
+            if (user.RefreshTokenExpiry < DateTime.Now)
+                return BadRequest("The refresh token is expired!");
 
             var newRefreshToken = GenerateRefreshToken();
             var newAccessToken = await GenerateAccessToken(user);
@@ -160,11 +171,13 @@ namespace WithMovies.WebApi.Controllers
             user.RefreshToken = newRefreshToken;
             await _dataContext.SaveChangesAsync();
 
-            return Ok(new AuthenticatedResponse()
-            {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken
-            });
+            return Ok(
+                new AuthenticatedResponse()
+                {
+                    AccessToken = newAccessToken,
+                    RefreshToken = newRefreshToken
+                }
+            );
         }
 
         [HttpPost, Authorize]
@@ -173,7 +186,8 @@ namespace WithMovies.WebApi.Controllers
         {
             var username = User.Identity!.Name;
             User? user = await _userManager.FindByIdAsync(UserId);
-            if (user == null) return BadRequest();
+            if (user == null)
+                return BadRequest();
 
             user.RefreshToken = string.Empty;
             await _dataContext.SaveChangesAsync();
@@ -185,22 +199,28 @@ namespace WithMovies.WebApi.Controllers
             var userRoles = await _userManager.GetRolesAsync(user);
 
             var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Email, user.Email!),
-                    new Claim(ClaimTypes.Name, user.UserName!),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id!)
-                };
+            {
+                new Claim(ClaimTypes.Email, user.Email!),
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.NameIdentifier, user.Id!)
+            };
 
-            foreach (var userRole in userRoles) claims.Add(new Claim(ClaimTypes.Role, userRole));
+            foreach (var userRole in userRoles)
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
 
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            var authSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+            );
 
             var tokeOptions = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 expires: DateTime.Now.AddMinutes(5),
                 claims: claims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                signingCredentials: new SigningCredentials(
+                    authSigningKey,
+                    SecurityAlgorithms.HmacSha256
+                )
             );
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
@@ -224,14 +244,24 @@ namespace WithMovies.WebApi.Controllers
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)),
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+                ),
                 ValidateLifetime = false // here we are saying that we don't care about the token's expiration date
             };
             var tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken securityToken;
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
-            var jwtSecurityToken = securityToken as JwtSecurityToken;
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            var principal = tokenHandler.ValidateToken(
+                token,
+                tokenValidationParameters,
+                out SecurityToken securityToken
+            );
+            if (
+                securityToken is not JwtSecurityToken jwtSecurityToken
+                || !jwtSecurityToken.Header.Alg.Equals(
+                    SecurityAlgorithms.HmacSha256,
+                    StringComparison.InvariantCultureIgnoreCase
+                )
+            )
                 throw new SecurityTokenException("Invalid token");
             return principal;
         }

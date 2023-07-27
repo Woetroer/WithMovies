@@ -56,7 +56,9 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
             },
             Friends = new List<User>() { },
             Watchlist = new List<Movie>() { },
-            Reviews = new List<Review>() { }
+            Reviews = new List<Review>() { },
+            IsBlocked = false,
+            CanReview = false,
         };
 
         context.Add(movie);

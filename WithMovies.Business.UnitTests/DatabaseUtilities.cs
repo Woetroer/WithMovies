@@ -57,7 +57,23 @@ namespace WithMovies.Business.UnitTests
                 Friends = new List<User>(),
                 Watchlist = new List<Movie>(),
                 Reviews = new List<Review>(),
-                RecommendationProfile = new RecommendationProfile { GenreWeights = new float[20], }
+                RecommendationProfile = new RecommendationProfile { GenreWeights = new float[20], },
+                IsBlocked = false,
+                CanReview = true
+            };
+
+            TestAdmin = new User
+            {
+                Email = "adminname@email.nl",
+                UserName = "TestAdmin",
+                Id = "my cooler GUID",
+                Friends = new List<User>(),
+                Watchlist = new List<Movie>(),
+                Reviews = new List<Review>(),
+                IsBlocked = false,
+                CanReview = true,
+                RecommendationProfile = new RecommendationProfile { GenreWeights = new float[20], },
+                //Claim = "Admin"
             };
 
             TestMovie1 = new Movie

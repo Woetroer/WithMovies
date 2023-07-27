@@ -192,8 +192,8 @@ namespace WithMovies.Business.Services
                 SELECT *,
                        (
                            SELECT Weight
-                           FROM WeightedMovies
-                           WHERE WeightedMovies.ParentId = :rProfileId
+                           FROM WeightedKeywords
+                           WHERE WeightedKeywords.ParentId = :rProfileId
                            AND WeightedMovies.MovieId = Movies.Id
                        ) AS Weight
                 FROM Movies

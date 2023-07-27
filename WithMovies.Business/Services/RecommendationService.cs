@@ -19,7 +19,7 @@ public class RecommendationService : IRecommendationService
     {
         _logger.LogInformation("Running recommendation engine");
 
-        var engine = new RecommendationEngine();
+        var engine = new RecommendationEngine(_dataContext);
         engine.Modules.Add(new ExplicitelyLikedGenreModule());
 
         var users = _dataContext.Users.Where(u => u.LastLogin > DateTime.Now.AddDays(-1));

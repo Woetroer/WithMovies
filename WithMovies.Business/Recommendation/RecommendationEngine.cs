@@ -22,7 +22,14 @@ public class RecommendationEngine
     }
 
     private float[] _genreWeights = new float[20];
-    private Dictionary<int, float> _movieWeights = new();
+    private Dictionary<int, float> _keywordWeights = new();
+
+    private DataContext _dataContext;
+
+    public RecommendationEngine(DataContext dataContext)
+    {
+        _dataContext = dataContext;
+    }
 
     public void SetTarget(RecommendationProfile target)
     {
@@ -53,13 +60,12 @@ public class RecommendationEngine
         MergeOutputs();
 
         _target.GenreWeights = _genreWeights;
-        _target.MovieWeights = _movieWeights
+        _target.KeywordWeights = _keywordWeights
             .Select(
                 (pair, i) =>
-                    new WeightedMovie
+                    new WeightedKeywordId
                     {
-                        MovieId = pair.Key,
-                        Parent = _target,
+                        Keyword = _dataContext.Keywords.Find(pair.Key)!,
                         Weight = pair.Value
                     }
             )
@@ -69,7 +75,7 @@ public class RecommendationEngine
     private void Reset()
     {
         _genreWeights = new float[20];
-        _movieWeights = new();
+        _keywordWeights = new();
 
         foreach (var module in Modules)
             module.Reset();
@@ -84,14 +90,14 @@ public class RecommendationEngine
             for (int i = 0; i < genreWeights.Length; i++)
                 _genreWeights[i] += genreWeights[i];
 
-            var movieWeights = module.GetMovieWeights();
+            var movieWeights = module.GetKeywordWeights();
 
             foreach (var pair in movieWeights)
             {
-                if (_movieWeights.TryGetValue(pair.Key, out float currValue))
-                    _movieWeights[pair.Key] = currValue + pair.Value;
+                if (_keywordWeights.TryGetValue(pair.Key, out float currValue))
+                    _keywordWeights[pair.Key] = currValue + pair.Value;
                 else
-                    _movieWeights[pair.Key] = pair.Value;
+                    _keywordWeights[pair.Key] = pair.Value;
             }
         }
 
@@ -101,10 +107,10 @@ public class RecommendationEngine
             _genreWeights[i] = _genreWeights[i] / max;
         }
 
-        max = _movieWeights.Values.Append(0.01f).Max();
-        foreach (var pair in _movieWeights)
+        max = _keywordWeights.Values.Append(0.01f).Max();
+        foreach (var pair in _keywordWeights)
         {
-            _movieWeights[pair.Key] /= max;
+            _keywordWeights[pair.Key] /= max;
         }
     }
 }

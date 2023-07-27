@@ -16,7 +16,7 @@ namespace WithMovies.Business
         public DbSet<ProductionCompany> ProductionCompanies { get; set; } = null!;
         public DbSet<RecommendationProfile> RecommendationProfiles { get; set; } = null!;
         public DbSet<RecommendationProfileInput> RecommendationProfileInputs { get; set; } = null!;
-        public DbSet<WeightedMovie> WeightedMovies { get; set; } = null!;
+        public DbSet<WeightedKeywordId> WeightedKeywords { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
 
         // Fake table, doesn't actually exist. This is used in KeywordService
@@ -98,6 +98,7 @@ namespace WithMovies.Business
             modelBuilder.Entity<User>().HasMany(m => m.Friends);
             modelBuilder.Entity<User>().HasMany(m => m.Watchlist);
             modelBuilder.Entity<User>().HasMany(m => m.Reviews).WithOne(r => r.Author);
+            modelBuilder.Entity<RecommendationProfile>().HasMany(p => p.KeywordWeights);
 
             modelBuilder.Entity<KeywordRecord>().HasNoKey();
 

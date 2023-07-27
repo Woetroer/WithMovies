@@ -10,19 +10,20 @@ namespace WithMovies.WebApi.Controllers
     [ApiController]
     public class RecommendationsController : MyControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly IUserService _userService;
-        public RecommendationsController(UserManager<User> userManager)
-        {
-            _userManager = userManager;
-        }
+        // private readonly UserManager<User> _userManager;
+        // private readonly IUserService _userService;
 
-        [Route("recommendation/preferences")]
-        [HttpGet]
-        public async Task<IActionResult> GetUserPreferences(List<GenrePreference> preferences)
-        {
-            preferences.Remove(preferences.Where(x => x.Genre == "Adult").First());
+        // public RecommendationsController(UserManager<User> userManager)
+        // {
+        //     _userManager = userManager;
+        // }
 
-        }
+        // [Route("recommendation/preferences")]
+        // [HttpGet]
+        // public async Task<IActionResult> GetUserPreferences(List<GenrePreference> preferences)
+        // {
+        //     preferences.Remove(preferences.Where(x => x.Genre == "Adult").First());
+
+        // }
     }
 }

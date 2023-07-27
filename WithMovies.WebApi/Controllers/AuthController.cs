@@ -100,6 +100,8 @@ namespace WithMovies.WebApi.Controllers
                     MovieWeights = new List<WeightedMovie>(),
                     GenreWeights = new float[20],
                 },
+                IsBlocked = false,
+                CanReview = true
             };
 
             // Create user

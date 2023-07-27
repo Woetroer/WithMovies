@@ -72,7 +72,7 @@ namespace WithMovies.WebApi.Controllers
             return Ok();
         }
 
-        [HttpDelete, Authorize(Roles = "Admin")]
+        [HttpDelete("admin-delete"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdminDeleteReview(int id)
         {
             await _reviewService.Delete(id);

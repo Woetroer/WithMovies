@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyModel;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Models;
@@ -23,7 +24,9 @@ namespace WithMovies.WebApi.Controllers
         public async Task<IActionResult> GetUserPreferences(List<GenrePreference> preferences)
         {
             preferences.Remove(preferences.Where(x => x.Genre == "Adult").First());
-            await _userService.AddPreferences(preferences);
+            
+            await _userService.AddPreferences(preferencesToSet);
+            return Ok();
         }
     }
 }

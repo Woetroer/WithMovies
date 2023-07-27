@@ -25,15 +25,12 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
 
     [Fact]
     public async Task TestCreate()
-    {
-        User user = ;
-
-         
-        await _service.Create(user, _movie, 3.5, "hoi", DateTime.Now);
+    {         
+        await _service.Create(_author, _movie, 3.5, "hoi", DateTime.Now);
 
         var reviewCheck = await _service.Read(4);
 
-        Assert.Equal(reviewCheck.Author, user);
+        Assert.Equal(reviewCheck.Author, _author);
     }
 
     // csharpier-ignore

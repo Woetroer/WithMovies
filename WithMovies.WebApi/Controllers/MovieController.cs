@@ -11,6 +11,7 @@ namespace WithMovies.WebApi.Controllers
     public class MovieController : MyControllerBase
     {
         private readonly IMovieService _movieService;
+
         public MovieController(IMovieService movieService)
         {
             _movieService = movieService;
@@ -27,8 +28,11 @@ namespace WithMovies.WebApi.Controllers
         [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetById(int id)
         {
-            var movieToReturn = await _movieService.GetById(id);
-            if (movieToReturn == null) { return NotFound(); }
+            var movieToReturn = await _movieService.GetByIdAsync(id);
+            if (movieToReturn == null)
+            {
+                return NotFound();
+            }
             return Ok(movieToReturn.ToDto());
         }
     }

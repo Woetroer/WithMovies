@@ -65,6 +65,7 @@ public class RecommendationEngine
                 (pair, i) =>
                     new WeightedKeywordId
                     {
+                        Parent = _target,
                         Keyword = _dataContext.Keywords.Find(pair.Key)!,
                         Weight = pair.Value
                     }

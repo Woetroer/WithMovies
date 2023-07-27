@@ -11,5 +11,8 @@ namespace WithMovies.Domain.Models
         public DateTime RefreshTokenExpiry { get; set; }
         public virtual RecommendationProfile RecommendationProfile { get; set; } = null!;
         public DateTime LastLogin { get; set; } = DateTime.Now;
+
+        public required bool IsBlocked { get; set; }
+        public required bool CanReview { get; set; }
     }
 }

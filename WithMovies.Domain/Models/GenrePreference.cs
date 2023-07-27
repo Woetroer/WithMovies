@@ -1,4 +1,4 @@
-﻿namespace WithMovies.WebApi.Models
+﻿namespace WithMovies.Domain.Models
 {
     public class GenrePreference
     {

@@ -17,6 +17,7 @@ namespace WithMovies.Business.Services
             _dataContext = dataContext;
         }
 
+
         public async Task Block(User user)
         {
             user.IsBlocked = !user.IsBlocked;
@@ -31,6 +32,22 @@ namespace WithMovies.Business.Services
         public async Task ReviewRights(User user)
         {
             user.CanReview = !user.CanReview;
+        }
+
+        public async Task AddPreferencesAsync(List<GenrePreference> preferences, User user)
+        {
+            User preferencesToSet = _dataContext.Users.Where(u => u.UserName == user.UserName).FirstOrDefault();
+            bool[] likedGenres = new bool[preferences.Count];
+            int i = 0;
+            foreach (var preference in preferences)
+            {
+                likedGenres[i] = preference.Likes;
+                i++;
+            };
+            preferencesToSet.RecommendationProfile.ExplicitelyLikedGenres = likedGenres;
+
+            _dataContext.Users.Update(preferencesToSet);
+            await _dataContext.SaveChangesAsync();
         }
     }
 }

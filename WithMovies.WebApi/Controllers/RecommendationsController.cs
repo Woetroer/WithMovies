@@ -24,8 +24,7 @@ namespace WithMovies.WebApi.Controllers
         public async Task<IActionResult> GetUserPreferences(List<GenrePreference> preferences)
         {
             preferences.Remove(preferences.Where(x => x.Genre == "Adult").First());
-            
-            await _userService.AddPreferences(preferencesToSet);
+            await _userService.AddPreferencesAsync(preferences, _userManager.Users.First(x => x.UserName == User.Identity!.Name!));
             return Ok();
         }
     }

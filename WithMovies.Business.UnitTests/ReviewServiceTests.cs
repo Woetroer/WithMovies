@@ -53,7 +53,12 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
             RecommendationProfile = new RecommendationProfile
             {
                 GenreWeights = new float[20],
-            }
+            },
+            Friends = new List<User>() { },
+            Watchlist = new List<Movie>() { },
+            Reviews = new List<Review>() { },
+            IsBlocked = false,
+            CanReview = false,
         };
 
         context.Add(movie);

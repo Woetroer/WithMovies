@@ -24,10 +24,9 @@ namespace WithMovies.WebApi.Controllers
 
         [HttpGet("trending/{start}/{limit}")]
         public async Task<IActionResult> Trending(int start, int limit) =>
-        Ok(
-            (await _movieService.GetTrending(start, limit))
-                .Select(MovieExtensions.ToPreviewDto)
-        );
+            Ok(
+                (await _movieService.GetTrending(start, limit)).Select(MovieExtensions.ToPreviewDto)
+            );
 
         [HttpGet("trending/recommended/{start}/{limit}"), Authorize]
         public async Task<IActionResult> TrendingRecommended(int start, int limit)
@@ -38,8 +37,9 @@ namespace WithMovies.WebApi.Controllers
                 return Unauthorized();
 
             return Ok(
-                (await _movieService.GetTrending(user, start, limit))
-                    .Select(MovieExtensions.ToPreviewDto)
+                (await _movieService.GetTrending(user, start, limit)).Select(
+                    MovieExtensions.ToPreviewDto
+                )
             );
         }
 
@@ -78,12 +78,12 @@ namespace WithMovies.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var movieToReturn = await _movieService.GetById(id);
+            var movie = await _movieService.GetByIdAsync(id);
 
-            if (movieToReturn == null)
+            if (movie == null)
                 return NotFound();
 
-            return Ok(movieToReturn.ToDto());
+            return Ok(movie.ToDto());
         }
     }
 }

@@ -44,9 +44,6 @@ namespace WithMovies.Business.Services
         public async Task<Review?> Read(int id) =>
             await _dataContext.Reviews.FirstOrDefaultAsync(p => p.Id == id);
 
-        public async Task<List<Review>> ReadAll(int movieId) =>
-            await _dataContext.Reviews.Where(m => m.Id == movieId).ToListAsync();
-
         public async Task Update(Review review)
         {
             _dataContext.Reviews.Update(review);

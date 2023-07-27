@@ -18,7 +18,7 @@ namespace WithMovies.Business.UnitTests
         [InlineData(5, "5 pees in a pod")]
         public async Task GetById(int id, string expected)
         {
-            var movie = await _service.GetById(id);
+            var movie = await _service.GetByIdAsync(id);
 
             Assert.Equal(movie?.Title, expected);
         }

@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
@@ -165,7 +164,7 @@ namespace WithMovies.Business.Services
             await _dataContext.AddRangeAsync(movies);
         }
 
-        public Task<Movie?> GetById(int movieId) =>
+        public Task<Movie?> GetByIdAsync(int movieId) =>
             _dataContext.Movies.Include(m => m.Keywords).FirstOrDefaultAsync(m => m.Id == movieId);
 
         public async Task<IQueryable<Movie>> GetTrending(int start, int limit)

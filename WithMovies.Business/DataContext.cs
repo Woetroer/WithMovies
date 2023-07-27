@@ -99,6 +99,14 @@ namespace WithMovies.Business
             modelBuilder.Entity<User>().HasMany(m => m.Watchlist);
             modelBuilder.Entity<User>().HasMany(m => m.Reviews).WithOne(r => r.Author);
             modelBuilder.Entity<User>().HasOne(u => u.RecommendationProfile);
+            modelBuilder
+                .Entity<RecommendationProfile>()
+                .HasMany(p => p.Inputs)
+                .WithOne(i => i.Parent);
+            modelBuilder
+                .Entity<RecommendationProfile>()
+                .HasMany(p => p.MovieWeights)
+                .WithOne(i => i.Parent);
 
             modelBuilder.Entity<KeywordRecord>().HasNoKey();
 

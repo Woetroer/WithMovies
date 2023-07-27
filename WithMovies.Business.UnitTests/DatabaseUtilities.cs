@@ -56,7 +56,8 @@ namespace WithMovies.Business.UnitTests
                 Id = "my cool GUID",
                 Friends = new List<User>(),
                 Watchlist = new List<Movie>(),
-                Reviews = new List<Review>()
+                Reviews = new List<Review>(),
+                RecommendationProfile = new RecommendationProfile { GenreWeights = new float[20], }
             };
 
             TestMovie1 = new Movie

@@ -20,20 +20,17 @@ namespace WithMovies.Business.Services
         public async Task Block(User user)
         {
             user.IsBlocked = !user.IsBlocked;
-            await _dataContext.SaveChangesAsync();
         }
 
         public async Task Delete(User user)
         {
             _dataContext.Users.Remove(user);
-            await _dataContext.SaveChangesAsync();
 
         }
 
         public async Task ReviewRights(User user)
         {
             user.CanReview = !user.CanReview;
-            await _dataContext.SaveChangesAsync();
         }
     }
 }

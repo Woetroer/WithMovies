@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using WithMovies.Business;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using static WithMovies.WebApi.Controllers.UserController;
@@ -15,11 +16,13 @@ namespace WithMovies.WebApi.Controllers
         private readonly IUserService _userService;
         private readonly IMovieService _movieService;
         private readonly UserManager<User> _userManager;
-        public UserController(IUserService userService, IMovieService movieService, UserManager<User> userManager)
+        private DataContext _dataContext;
+        public UserController(IUserService userService, IMovieService movieService, UserManager<User> userManager, DataContext dataContext)
         {
             _userService = userService;
             _movieService = movieService;
             _userManager = userManager;
+            _dataContext = dataContext;
         }
 
         public record Profile(string Email, string Username);
@@ -31,6 +34,7 @@ namespace WithMovies.WebApi.Controllers
             string name = user.UserName;
             await _userService.Block(user);
 
+            await _dataContext.SaveChangesAsync();
             return Ok("User " + name + " is blocked.");
         }
 
@@ -42,6 +46,7 @@ namespace WithMovies.WebApi.Controllers
 
 
             await _userService.ReviewRights(user);
+            await _dataContext.SaveChangesAsync();
 
             if (user.CanReview = false)
                 return Ok("User " + user + " can no longer review.");
@@ -55,6 +60,7 @@ namespace WithMovies.WebApi.Controllers
             string name = user.UserName;
 
             await _userService.Delete(user);
+            await _dataContext.SaveChangesAsync();
 
             return Ok("User" + name + "is deleted.");
         }

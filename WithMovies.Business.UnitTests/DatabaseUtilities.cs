@@ -339,7 +339,7 @@ namespace WithMovies.Business.UnitTests
             TestRecommendation1 = new RecommendationProfile
             {
                 Id = 0,
-                ExplicitelyLikedGenres = new bool[20],
+                ExplicitlyLikedGenres = new bool[20],
                 GenreWeights = new float[20],
             };
         }

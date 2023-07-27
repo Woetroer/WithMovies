@@ -11,15 +11,15 @@ using WithMovies.Business;
 namespace WithMovies.Business.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230724100639_Keywordsthings2")]
-    partial class Keywordsthings2
+    [Migration("20230727101959_DefinitelyNotInitialCreate")]
+    partial class DefinitelyNotInitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.8")
+                .HasAnnotation("ProductVersion", "7.0.9")
                 .HasAnnotation("Proxies:ChangeTracking", false)
                 .HasAnnotation("Proxies:CheckEquality", false)
                 .HasAnnotation("Proxies:LazyLoading", true);
@@ -52,6 +52,21 @@ namespace WithMovies.Business.Migrations
                     b.HasIndex("MoviesId");
 
                     b.ToTable("CrewMemberMovie");
+                });
+
+            modelBuilder.Entity("KeywordMovie", b =>
+                {
+                    b.Property<int>("KeywordsId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MoviesId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("KeywordsId", "MoviesId");
+
+                    b.HasIndex("MoviesId");
+
+                    b.ToTable("KeywordMovie");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -308,13 +323,6 @@ namespace WithMovies.Business.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("KeywordId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Keywords")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("OriginalLanguage")
                         .HasColumnType("TEXT");
 
@@ -373,8 +381,6 @@ namespace WithMovies.Business.Migrations
 
                     b.HasIndex("BelongsToCollectionId");
 
-                    b.HasIndex("KeywordId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("Movies");
@@ -422,7 +428,7 @@ namespace WithMovies.Business.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("ExplicitelyLikedGenres")
+                    b.Property<byte[]>("ExplicitlyLikedGenres")
                         .IsRequired()
                         .HasColumnType("BLOB");
 
@@ -503,6 +509,9 @@ namespace WithMovies.Business.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("CanReview")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
@@ -512,6 +521,9 @@ namespace WithMovies.Business.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsBlocked")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastLogin")
@@ -542,6 +554,13 @@ namespace WithMovies.Business.Migrations
 
                     b.Property<int>("RecommendationProfileId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("RefreshTokenExpiry")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
@@ -624,6 +643,21 @@ namespace WithMovies.Business.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("KeywordMovie", b =>
+                {
+                    b.HasOne("WithMovies.Domain.Models.Keyword", null)
+                        .WithMany()
+                        .HasForeignKey("KeywordsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WithMovies.Domain.Models.Movie", null)
+                        .WithMany()
+                        .HasForeignKey("MoviesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -696,10 +730,6 @@ namespace WithMovies.Business.Migrations
                         .WithMany("Movies")
                         .HasForeignKey("BelongsToCollectionId");
 
-                    b.HasOne("WithMovies.Domain.Models.Keyword", null)
-                        .WithMany("Movies")
-                        .HasForeignKey("KeywordId");
-
                     b.HasOne("WithMovies.Domain.Models.User", null)
                         .WithMany("Watchlist")
                         .HasForeignKey("UserId");
@@ -769,11 +799,6 @@ namespace WithMovies.Business.Migrations
                         .IsRequired();
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("WithMovies.Domain.Models.Keyword", b =>
-                {
-                    b.Navigation("Movies");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.Movie", b =>

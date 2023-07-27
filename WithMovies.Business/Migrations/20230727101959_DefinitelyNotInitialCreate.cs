@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WithMovies.Business.Migrations
 {
     /// <inheritdoc />
-    public partial class testmigration : Migration
+    public partial class DefinitelyNotInitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -118,7 +118,7 @@ namespace WithMovies.Business.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    ExplicitelyLikedGenres = table.Column<byte[]>(type: "BLOB", nullable: false)
+                    ExplicitlyLikedGenres = table.Column<byte[]>(type: "BLOB", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -155,6 +155,8 @@ namespace WithMovies.Business.Migrations
                     RefreshTokenExpiry = table.Column<DateTime>(type: "TEXT", nullable: false),
                     RecommendationProfileId = table.Column<int>(type: "INTEGER", nullable: false),
                     LastLogin = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsBlocked = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CanReview = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),

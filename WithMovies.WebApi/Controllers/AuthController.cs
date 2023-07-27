@@ -96,7 +96,7 @@ namespace WithMovies.WebApi.Controllers
                 RecommendationProfile = new RecommendationProfile
                 {
                     Inputs = new List<RecommendationProfileInput>(),
-                    ExplicitelyLikedGenres = new bool[20],
+                    ExplicitlyLikedGenres = new bool[20],
                     MovieWeights = new List<WeightedMovie>(),
                     GenreWeights = new float[20],
                 },
@@ -154,7 +154,7 @@ namespace WithMovies.WebApi.Controllers
             var principal = GetPrincipalFromExpiredToken(tokenApiModel.AccessToken);
             var username = principal.Identity!.Name;
 
-            var user = _userManager.Users.SingleOrDefault(u => u.UserName == username);
+            var user = await _userManager.FindByIdAsync(principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value);
             if (
                 user is null
                 || user.RefreshToken != refreshToken
@@ -267,5 +267,19 @@ namespace WithMovies.WebApi.Controllers
                 throw new SecurityTokenException("Invalid token");
             return principal;
         }
+
+        [HttpPost, Authorize]
+        [Route("reset-password")]
+        public async Task<IActionResult> ResetPassword(string oldPassword, string newPassword)
+        {
+            User? user = await _userManager.FindByIdAsync(UserId);
+
+            if (user == null) return BadRequest("User not found!");
+
+            await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+
+            return Ok();
+        }
+
     }
 }

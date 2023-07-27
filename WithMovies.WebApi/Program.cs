@@ -6,9 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WithMovies.Business;
 using WithMovies.Business.Services;
+using WithMovies.Data.Sqlite;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
-using WithMovies.Data.Sqlite;
 
 namespace WithMovies.WebApi
 {
@@ -44,7 +44,8 @@ namespace WithMovies.WebApi
             builder.Services.AddScoped<IKeywordService, SqliteKeywordService>();
             builder.Services.AddScoped<ICreditsService, CreditsService>();
             builder.Services.AddScoped<IMovieService, MovieService>();
-            builder.Services.AddHostedService<AlgorithmScheduler>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            //builder.Services.AddHostedService<AlgorithmScheduler>();
             builder.Services.AddLogging(
                 x =>
                     x.ClearProviders()

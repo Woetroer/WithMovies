@@ -11,18 +11,18 @@
         public virtual ICollection<RecommendationProfileInput> Inputs { get; set; } = null!;
 
         /// <summary>
-        /// Which genres the user explicitely selected as one they liked on the
+        /// Which genres the user explicitly selected as one they liked on the
         /// account settings page. This array can be indexed by a genre.
         ///
         /// <example>
         /// For example:
         ///
         /// <code>
-        /// bool userLikesCrime = ExplicitelyLikedGenres[(int)Genre.Crime];
+        /// bool userLikesCrime = ExplicitlyLikedGenres[(int)Genre.Crime];
         /// </code>
         /// </example>
         /// </summary>
-        public virtual bool[] ExplicitelyLikedGenres { get; set; } = new bool[20];
+        public virtual bool[] ExplicitlyLikedGenres { get; set; } = new bool[20];
 
         // Outputs
 

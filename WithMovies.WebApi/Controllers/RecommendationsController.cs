@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Models;
 
@@ -19,9 +19,10 @@ namespace WithMovies.WebApi.Controllers
 
         [Route("recommendation/preferences")]
         [HttpGet]
-        public async Task<IActionResult> GetUserPreferences(List<GenrePreference> preferences)
+        public Task<IActionResult> GetUserPreferences(List<GenrePreference> preferences)
         {
             preferences.Remove(preferences.Where(x => x.Genre == "Adult").First());
+            throw new NotImplementedException();
 
         }
     }

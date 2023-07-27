@@ -425,7 +425,7 @@ namespace WithMovies.Business.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("ExplicitelyLikedGenres")
+                    b.Property<byte[]>("ExplicitlyLikedGenres")
                         .IsRequired()
                         .HasColumnType("BLOB");
 
@@ -506,6 +506,9 @@ namespace WithMovies.Business.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("CanReview")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
@@ -515,6 +518,9 @@ namespace WithMovies.Business.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsBlocked")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastLogin")

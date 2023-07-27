@@ -67,7 +67,7 @@ namespace WithMovies.Business
 
             modelBuilder
                 .Entity<RecommendationProfile>()
-                .Property(p => p.ExplicitelyLikedGenres)
+                .Property(p => p.ExplicitlyLikedGenres)
                 .HasConversion(
                     v => v != null ? v.Select(b => b ? (byte)1 : (byte)0).ToArray() : new byte[20],
                     v => v != null ? v.Select(b => b != 0).ToArray() : new bool[20]

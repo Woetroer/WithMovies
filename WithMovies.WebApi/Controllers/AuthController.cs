@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using WithMovies.Business;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Models;
@@ -12,19 +14,14 @@ namespace WithMovies.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : MyControllerBase
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly DataContext _dataContext;
         private readonly IConfiguration _config;
 
-        public AuthController(
-            UserManager<User> userManager,
-            IConfiguration config,
-            RoleManager<IdentityRole> roleManager,
-            DataContext dataContext
-        )
+        public AuthController(UserManager<User> userManager, IConfiguration config, RoleManager<IdentityRole> roleManager, DataContext dataContext)
         {
             _userManager = userManager;
             _config = config;
@@ -32,9 +29,15 @@ namespace WithMovies.WebApi.Controllers
             _dataContext = dataContext;
         }
 
+        public class AuthenticatedResponse
+        {
+            public string? AccessToken { get; set; }
+            public string? RefreshToken { get; set; }
+        }
+
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] Login model)
+        public async Task<IActionResult> Login(LoginModel model)
         {
             if (model == null)
                 return BadRequest();
@@ -44,47 +47,25 @@ namespace WithMovies.WebApi.Controllers
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
                 return Unauthorized();
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.NameIdentifier, user.Id!)
-            };
+            var accessToken = await GenerateAccessToken(user);
+            var refreshToken = GenerateRefreshToken();
 
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            foreach (var userRole in userRoles)
-                claims.Add(new Claim(ClaimTypes.Role, userRole));
-
-            var authSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
-            );
-
-            var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                expires: DateTime.Now.AddHours(3),
-                claims: claims,
-                signingCredentials: new SigningCredentials(
-                    authSigningKey,
-                    SecurityAlgorithms.HmacSha256
-                )
-            );
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = DateTime.Now.AddDays(7);
 
             user.LastLogin = DateTime.Now;
             await _dataContext.SaveChangesAsync();
 
-            return Ok(
-                new
-                {
-                    Token = new JwtSecurityTokenHandler().WriteToken(token),
-                    Expiration = token.ValidTo
-                }
-            );
+            return Ok(new AuthenticatedResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            });
         }
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] Register model)
+        public async Task<IActionResult> Register(RegisterModel model)
         {
             await CheckIfValid(model);
 
@@ -116,6 +97,8 @@ namespace WithMovies.WebApi.Controllers
                     MovieWeights = new List<WeightedMovie>(),
                     GenreWeights = new float[20],
                 },
+                IsBlocked = false,
+                CanReview = true
             };
 
             // Create user
@@ -138,7 +121,7 @@ namespace WithMovies.WebApi.Controllers
             return Ok();
         }
 
-        private async Task<IActionResult> CheckIfValid(Register model)
+        private async Task<IActionResult> CheckIfValid(RegisterModel model)
         {
             if (model == null)
                 return BadRequest();
@@ -152,6 +135,105 @@ namespace WithMovies.WebApi.Controllers
                 return StatusCode(StatusCodes.Status409Conflict, "User already exists");
 
             return Ok();
+        }
+
+        [HttpPost]
+        [Route("refresh")]
+        public async Task<IActionResult> Refresh(TokenApiModel tokenApiModel)
+        {
+            if (tokenApiModel.RefreshToken == null) return BadRequest("Refresh token is null!");
+            if (tokenApiModel.AccessToken == null) return BadRequest("Access Token is null!");
+
+            string refreshToken = tokenApiModel.RefreshToken;
+
+            var principal = GetPrincipalFromExpiredToken(tokenApiModel.AccessToken);
+            var username = principal.Identity!.Name;
+
+            var user = _userManager.Users.SingleOrDefault(u => u.UserName == username);
+            if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTime.Now)
+                return BadRequest("Invalid client request");
+
+            if (user.RefreshToken != refreshToken) return BadRequest("Invalid refresh token!");
+            if (user.RefreshTokenExpiry < DateTime.Now) return BadRequest("The refresh token is expired!");
+
+            var newRefreshToken = GenerateRefreshToken();
+            var newAccessToken = await GenerateAccessToken(user);
+
+            user.RefreshToken = newRefreshToken;
+            await _dataContext.SaveChangesAsync();
+
+            return Ok(new AuthenticatedResponse()
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            });
+        }
+
+        [HttpPost, Authorize]
+        [Route("revoke")]
+        public async Task<IActionResult> Revoke()
+        {
+            var username = User.Identity!.Name;
+            User? user = await _userManager.FindByIdAsync(UserId);
+            if (user == null) return BadRequest();
+
+            user.RefreshToken = string.Empty;
+            await _dataContext.SaveChangesAsync();
+            return Ok();
+        }
+
+        private async Task<string> GenerateAccessToken(User user)
+        {
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Email, user.Email!),
+                    new Claim(ClaimTypes.Name, user.UserName!),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id!)
+                };
+
+            foreach (var userRole in userRoles) claims.Add(new Claim(ClaimTypes.Role, userRole));
+
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+
+            var tokeOptions = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                expires: DateTime.Now.AddMinutes(5),
+                claims: claims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+            return tokenString;
+        }
+
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)),
+                ValidateLifetime = false // here we are saying that we don't care about the token's expiration date
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+            return principal;
         }
     }
 }

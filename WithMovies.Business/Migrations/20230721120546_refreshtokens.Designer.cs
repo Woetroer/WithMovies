@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WithMovies.Business;
 
@@ -10,9 +11,11 @@ using WithMovies.Business;
 namespace WithMovies.Business.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230721120546_refreshtokens")]
+    partial class refreshtokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,51 +23,6 @@ namespace WithMovies.Business.Migrations
                 .HasAnnotation("Proxies:ChangeTracking", false)
                 .HasAnnotation("Proxies:CheckEquality", false)
                 .HasAnnotation("Proxies:LazyLoading", true);
-
-            modelBuilder.Entity("CastMemberMovie", b =>
-                {
-                    b.Property<int>("CastId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("CastId", "MoviesId");
-
-                    b.HasIndex("MoviesId");
-
-                    b.ToTable("CastMemberMovie");
-                });
-
-            modelBuilder.Entity("CrewMemberMovie", b =>
-                {
-                    b.Property<int>("CrewId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("CrewId", "MoviesId");
-
-                    b.HasIndex("MoviesId");
-
-                    b.ToTable("CrewMemberMovie");
-                });
-
-            modelBuilder.Entity("KeywordMovie", b =>
-                {
-                    b.Property<int>("KeywordsId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("KeywordsId", "MoviesId");
-
-                    b.HasIndex("MoviesId");
-
-                    b.ToTable("KeywordMovie");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -194,32 +152,6 @@ namespace WithMovies.Business.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MovieProductionCompany", b =>
-                {
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProductionCompaniesId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("MoviesId", "ProductionCompaniesId");
-
-                    b.HasIndex("ProductionCompaniesId");
-
-                    b.ToTable("MovieProductionCompany");
-                });
-
-            modelBuilder.Entity("WithMovies.Domain.KeywordRecord", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT");
-
-                    b.Property<float?>("Weight")
-                        .HasColumnType("REAL");
-
-                    b.ToTable("KeywordRecords");
-                });
-
             modelBuilder.Entity("WithMovies.Domain.Models.CastMember", b =>
                 {
                     b.Property<int>("Id")
@@ -232,6 +164,9 @@ namespace WithMovies.Business.Migrations
                     b.Property<string>("Character")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("CreditsId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Gender")
                         .HasColumnType("INTEGER");
@@ -248,7 +183,25 @@ namespace WithMovies.Business.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreditsId");
+
                     b.ToTable("CastMembers");
+                });
+
+            modelBuilder.Entity("WithMovies.Domain.Models.Credits", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("Credits");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.CrewMember", b =>
@@ -257,15 +210,17 @@ namespace WithMovies.Business.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("CreditsId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Department")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Gender")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Job")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Job")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -275,6 +230,8 @@ namespace WithMovies.Business.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreditsId");
 
                     b.ToTable("CrewMembers");
                 });
@@ -309,6 +266,12 @@ namespace WithMovies.Business.Migrations
                     b.Property<int>("Budget")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("CastMemberId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CrewMemberId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Genres")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -319,6 +282,9 @@ namespace WithMovies.Business.Migrations
                     b.Property<string>("ImdbId")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("KeywordId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("OriginalLanguage")
                         .HasColumnType("TEXT");
@@ -378,6 +344,12 @@ namespace WithMovies.Business.Migrations
 
                     b.HasIndex("BelongsToCollectionId");
 
+                    b.HasIndex("CastMemberId");
+
+                    b.HasIndex("CrewMemberId");
+
+                    b.HasIndex("KeywordId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Movies");
@@ -410,11 +382,16 @@ namespace WithMovies.Business.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("MovieId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
 
                     b.ToTable("ProductionCompanies");
                 });
@@ -425,46 +402,9 @@ namespace WithMovies.Business.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("ExplicitelyLikedGenres")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
-
                     b.HasKey("Id");
 
                     b.ToTable("RecommendationProfiles");
-                });
-
-            modelBuilder.Entity("WithMovies.Domain.Models.RecommendationProfileInput", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ParentId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double?>("Rating")
-                        .HasColumnType("REAL");
-
-                    b.Property<bool>("ViewedDetailsPage")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Watched")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MovieId");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("RecommendationProfileInputs");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.Review", b =>
@@ -472,10 +412,6 @@ namespace WithMovies.Business.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("AuthorId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Message")
                         .HasColumnType("TEXT");
@@ -486,14 +422,18 @@ namespace WithMovies.Business.Migrations
                     b.Property<DateTime>("PostedTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<double>("Rating")
-                        .HasColumnType("REAL");
+                    b.Property<int>("Rating")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId1")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("MovieId");
+                    b.HasIndex("UserId1");
 
                     b.ToTable("Reviews");
                 });
@@ -516,9 +456,6 @@ namespace WithMovies.Business.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("LastLogin")
-                        .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
@@ -572,78 +509,9 @@ namespace WithMovies.Business.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.HasIndex("RecommendationProfileId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("WithMovies.Domain.Models.WeightedMovie", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ParentId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<float>("Weight")
-                        .HasColumnType("REAL");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("WeightedMovies");
-                });
-
-            modelBuilder.Entity("CastMemberMovie", b =>
-                {
-                    b.HasOne("WithMovies.Domain.Models.CastMember", null)
-                        .WithMany()
-                        .HasForeignKey("CastId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WithMovies.Domain.Models.Movie", null)
-                        .WithMany()
-                        .HasForeignKey("MoviesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CrewMemberMovie", b =>
-                {
-                    b.HasOne("WithMovies.Domain.Models.CrewMember", null)
-                        .WithMany()
-                        .HasForeignKey("CrewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WithMovies.Domain.Models.Movie", null)
-                        .WithMany()
-                        .HasForeignKey("MoviesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("KeywordMovie", b =>
-                {
-                    b.HasOne("WithMovies.Domain.Models.Keyword", null)
-                        .WithMany()
-                        .HasForeignKey("KeywordsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WithMovies.Domain.Models.Movie", null)
-                        .WithMany()
-                        .HasForeignKey("MoviesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -697,19 +565,37 @@ namespace WithMovies.Business.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MovieProductionCompany", b =>
+            modelBuilder.Entity("WithMovies.Domain.Models.CastMember", b =>
                 {
-                    b.HasOne("WithMovies.Domain.Models.Movie", null)
-                        .WithMany()
-                        .HasForeignKey("MoviesId")
+                    b.HasOne("WithMovies.Domain.Models.Credits", "Credits")
+                        .WithMany("Cast")
+                        .HasForeignKey("CreditsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WithMovies.Domain.Models.ProductionCompany", null)
+                    b.Navigation("Credits");
+                });
+
+            modelBuilder.Entity("WithMovies.Domain.Models.Credits", b =>
+                {
+                    b.HasOne("WithMovies.Domain.Models.Movie", "Movie")
                         .WithMany()
-                        .HasForeignKey("ProductionCompaniesId")
+                        .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("WithMovies.Domain.Models.CrewMember", b =>
+                {
+                    b.HasOne("WithMovies.Domain.Models.Credits", "Credits")
+                        .WithMany("Crew")
+                        .HasForeignKey("CreditsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Credits");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.Movie", b =>
@@ -718,6 +604,18 @@ namespace WithMovies.Business.Migrations
                         .WithMany("Movies")
                         .HasForeignKey("BelongsToCollectionId");
 
+                    b.HasOne("WithMovies.Domain.Models.CastMember", null)
+                        .WithMany("Movies")
+                        .HasForeignKey("CastMemberId");
+
+                    b.HasOne("WithMovies.Domain.Models.CrewMember", null)
+                        .WithMany("Movies")
+                        .HasForeignKey("CrewMemberId");
+
+                    b.HasOne("WithMovies.Domain.Models.Keyword", null)
+                        .WithMany("Movies")
+                        .HasForeignKey("KeywordId");
+
                     b.HasOne("WithMovies.Domain.Models.User", null)
                         .WithMany("Watchlist")
                         .HasForeignKey("UserId");
@@ -725,85 +623,57 @@ namespace WithMovies.Business.Migrations
                     b.Navigation("BelongsToCollection");
                 });
 
-            modelBuilder.Entity("WithMovies.Domain.Models.RecommendationProfileInput", b =>
+            modelBuilder.Entity("WithMovies.Domain.Models.ProductionCompany", b =>
                 {
-                    b.HasOne("WithMovies.Domain.Models.Movie", "Movie")
-                        .WithMany()
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WithMovies.Domain.Models.RecommendationProfile", "Parent")
-                        .WithMany("Inputs")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Movie");
-
-                    b.Navigation("Parent");
+                    b.HasOne("WithMovies.Domain.Models.Movie", null)
+                        .WithMany("ProductionCompanies")
+                        .HasForeignKey("MovieId");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.Review", b =>
                 {
-                    b.HasOne("WithMovies.Domain.Models.User", "Author")
+                    b.HasOne("WithMovies.Domain.Models.User", null)
                         .WithMany("Reviews")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WithMovies.Domain.Models.Movie", "Movie")
-                        .WithMany("Reviews")
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Movie");
+                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.User", b =>
                 {
-                    b.HasOne("WithMovies.Domain.Models.RecommendationProfile", "RecommendationProfile")
-                        .WithMany()
-                        .HasForeignKey("RecommendationProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WithMovies.Domain.Models.User", null)
                         .WithMany("Friends")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("RecommendationProfile");
                 });
 
-            modelBuilder.Entity("WithMovies.Domain.Models.WeightedMovie", b =>
+            modelBuilder.Entity("WithMovies.Domain.Models.CastMember", b =>
                 {
-                    b.HasOne("WithMovies.Domain.Models.RecommendationProfile", "Parent")
-                        .WithMany("MovieWeights")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Movies");
+                });
 
-                    b.Navigation("Parent");
+            modelBuilder.Entity("WithMovies.Domain.Models.Credits", b =>
+                {
+                    b.Navigation("Cast");
+
+                    b.Navigation("Crew");
+                });
+
+            modelBuilder.Entity("WithMovies.Domain.Models.CrewMember", b =>
+                {
+                    b.Navigation("Movies");
+                });
+
+            modelBuilder.Entity("WithMovies.Domain.Models.Keyword", b =>
+                {
+                    b.Navigation("Movies");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.Movie", b =>
                 {
-                    b.Navigation("Reviews");
+                    b.Navigation("ProductionCompanies");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.MovieCollection", b =>
                 {
                     b.Navigation("Movies");
-                });
-
-            modelBuilder.Entity("WithMovies.Domain.Models.RecommendationProfile", b =>
-                {
-                    b.Navigation("Inputs");
-
-                    b.Navigation("MovieWeights");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.User", b =>

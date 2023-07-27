@@ -16,7 +16,11 @@ namespace WithMovies.WebApi.Controllers
         private readonly IMovieService _movieService;
         private readonly UserManager<User> _userManager;
 
-        public ReviewController(IReviewService reviewService, IMovieService movieService, UserManager<User> userManager)
+        public ReviewController(
+            IReviewService reviewService,
+            IMovieService movieService,
+            UserManager<User> userManager
+        )
         {
             _reviewService = reviewService;
             _movieService = movieService;
@@ -28,27 +32,36 @@ namespace WithMovies.WebApi.Controllers
         [HttpPost("create"), Authorize]
         public async Task<IActionResult> CreateReview(ReviewToAdd reviewToAdd)
         {
-            var movie = await _movieService.GetById(reviewToAdd.MovieId);
+            var movie = await _movieService.GetByIdAsync(reviewToAdd.MovieId);
 
             if (movie == null)
                 return NotFound("This movie doesn't exist");
 
             var user = _userManager.Users.First(x => x.UserName == User.Identity!.Name!);
 
-            await _reviewService.Create(user, movie, reviewToAdd.Rating, reviewToAdd.Message, DateTime.Now);
+            if (!user.CanReview)
+                return Unauthorized("You've been blocked from making more reviews.");
 
-            return Ok("Your review is added!");
+            await _reviewService.Create(
+                user,
+                movie,
+                reviewToAdd.Rating,
+                reviewToAdd.Message,
+                DateTime.Now
+            );
+
+            return Ok();
         }
 
         [HttpGet("movie/{id}")]
         public async Task<IActionResult> ReadReviews(int id)
         {
-            List<ReviewDto> dto = new();
-            List<Review> reviews = await _reviewService.ReadAll(id);
-            foreach (Review review in reviews)
-                dto.Add(review.ToDto());
+            var movie = await _movieService.GetByIdAsync(id);
 
-            return Ok(dto);
+            if (movie == null)
+                return NotFound();
+
+            return Ok(movie.Reviews.Select(ReviewExtensions.ToDto));
         }
 
         public record UpdateArgs(int ReviewId, int MovieId, int Rating, string? Message);

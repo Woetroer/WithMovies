@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WithMovies.Domain.Interfaces;
 using WithMovies.WebApi.Dtos;
 using WithMovies.WebApi.Extensions;
@@ -7,15 +8,16 @@ namespace WithMovies.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MovieController : ControllerBase
+    public class MovieController : MyControllerBase
     {
         private readonly IMovieService _movieService;
+
         public MovieController(IMovieService movieService)
         {
             _movieService = movieService;
         }
 
-        [Route("GetPopularMovies")]
+        [Route("GetPopularMovies"), Authorize]
         [HttpGet]
         public async Task<IActionResult> GetPopularMovies()
         {
@@ -23,11 +25,14 @@ namespace WithMovies.WebApi.Controllers
             return Ok(preview);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetById(int id)
         {
-            var movieToReturn = await _movieService.GetById(id);
-            if (movieToReturn == null) { return NotFound(); }
+            var movieToReturn = await _movieService.GetByIdAsync(id);
+            if (movieToReturn == null)
+            {
+                return NotFound();
+            }
             return Ok(movieToReturn.ToDto());
         }
     }

@@ -38,18 +38,15 @@ namespace WithMovies.Business.Services
                 PostedTime = postedTime
             };
 
-            movie.VoteAverage = ((movie.VoteAverage * movie.VoteCount) + rating) / ++movie.VoteCount;
+            movie.VoteAverage =
+                ((movie.VoteAverage * movie.VoteCount) + rating) / ++movie.VoteCount;
 
             _dataContext.Update(movie);
             await _dataContext.AddAsync(reviewToAdd);
             await _dataContext.SaveChangesAsync();
         }
 
-        public Task<Review?> Read(int id) =>
-            _dataContext.Reviews.FindAsync(id).AsTask();
-
-        public Task<List<Review>> ReadAll(int movieId) =>
-            _dataContext.Reviews.Where(m => m.Id == movieId).ToListAsync();
+        public Task<Review?> Read(int id) => _dataContext.Reviews.FindAsync(id).AsTask();
 
         public async Task Update(Review review)
         {

@@ -34,10 +34,6 @@ namespace WithMovies.WebApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddSingleton<
-                IDatabaseExtensionsLoaderService,
-                SqliteDatabaseExtensionsLoaderService
-            >();
             builder.Services.AddScoped<IProductionCompanyService, ProductionCompanyService>();
             builder.Services.AddScoped<IMovieCollectionService, MovieCollectionService>();
             builder.Services.AddScoped<IRecommendationService, RecommendationService>();

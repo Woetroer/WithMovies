@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WithMovies.Business;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Dtos;
@@ -15,11 +16,20 @@ namespace WithMovies.WebApi.Controllers
     {
         private readonly IMovieService _movieService;
         private readonly UserManager<User> _userManager;
+        private readonly IRecommendationService _recommendationService;
+        private readonly DataContext _dataContext;
 
-        public MovieController(IMovieService movieService, UserManager<User> userManager)
+        public MovieController(
+            IMovieService movieService,
+            UserManager<User> userManager,
+            IRecommendationService recommendationService,
+            DataContext dataContext
+        )
         {
             _movieService = movieService;
             _userManager = userManager;
+            _recommendationService = recommendationService;
+            _dataContext = dataContext;
         }
 
         [HttpGet("trending/{start}/{limit}")]
@@ -82,6 +92,25 @@ namespace WithMovies.WebApi.Controllers
 
             if (movie == null)
                 return NotFound();
+
+            return Ok(movie.ToDto());
+        }
+
+        [HttpGet("{id}/authorized"), Authorize]
+        public async Task<IActionResult> GetByIdAuthorized(int id)
+        {
+            var user = await _userManager.FindByIdAsync(UserId);
+
+            if (user == null)
+                return Unauthorized();
+
+            var movie = await _movieService.GetByIdAsync(id);
+
+            if (movie == null)
+                return NotFound();
+
+            await _recommendationService.FlagViewedDetailsPageAsync(user, movie);
+            await _dataContext.SaveChangesAsync();
 
             return Ok(movie.ToDto());
         }

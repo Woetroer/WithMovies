@@ -60,6 +60,8 @@ public class RecommendationEngine
         MergeOutputs();
 
         _target.GenreWeights = _genreWeights;
+        _dataContext.RemoveRange(_target.KeywordWeights);
+
         _target.KeywordWeights = _keywordWeights
             .Select(
                 (pair, i) =>

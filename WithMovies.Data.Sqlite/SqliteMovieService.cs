@@ -2,6 +2,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using WithMovies.Data.Sqlite;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
@@ -48,19 +49,16 @@ namespace WithMovies.Business.Services
         private readonly DataContext _dataContext;
         private readonly ILogger<SqliteMovieService> _logger;
         private readonly IMovieCollectionService _movieCollectionService;
-        private readonly IDatabaseExtensionsLoaderService _extensionsLoaderService;
 
         public SqliteMovieService(
             DataContext dataContext,
             IMovieCollectionService movieCollectionService,
-            ILogger<SqliteMovieService> logger,
-            IDatabaseExtensionsLoaderService extensionsLoaderService
+            ILogger<SqliteMovieService> logger
         )
         {
             _logger = logger;
             _dataContext = dataContext;
             _movieCollectionService = movieCollectionService;
-            _extensionsLoaderService = extensionsLoaderService;
         }
 
         public async Task ImportJsonAsync(Stream json)
@@ -169,42 +167,47 @@ namespace WithMovies.Business.Services
 
         public async Task<IQueryable<Movie>> GetTrending(int start, int limit)
         {
-            await _extensionsLoaderService.EnsureLoaded("math");
-
-            return _dataContext.Movies.FromSqlRaw(
-                """
-                SELECT * FROM Movies
-                ORDER BY pow(VoteCount, VoteAverage) DESC
-                LIMIT :limit
-                OFFSET :start
-                """,
-                new SqliteParameter(":start", start),
-                new SqliteParameter(":limit", limit)
-            );
+            return _dataContext
+                .LoadExtension("math")
+                .Movies.FromSqlRaw(
+                    """
+                    SELECT * FROM Movies
+                    ORDER BY pow(VoteCount, VoteAverage) DESC
+                    LIMIT :limit
+                    OFFSET :start
+                    """,
+                    new SqliteParameter(":start", start),
+                    new SqliteParameter(":limit", limit)
+                );
         }
 
         public async Task<IQueryable<Movie>> GetTrending(User user, int start, int limit)
         {
-            await _extensionsLoaderService.EnsureLoaded("math");
-
-            return _dataContext.Movies.FromSqlRaw(
-                """
-                SELECT *,
-                       (
-                           SELECT Weight
-                           FROM WeightedKeywords
-                           WHERE WeightedKeywords.ParentId = :rProfileId
-                           AND WeightedMovies.MovieId = Movies.Id
-                       ) AS Weight
-                FROM Movies
-                ORDER BY pow(VoteCount, VoteAverage) * Weight * Weight DESC
-                LIMIT :limit
-                OFFSET :start
-                """,
-                new SqliteParameter(":rProfileId", user.RecommendationProfile.Id),
-                new SqliteParameter(":start", start),
-                new SqliteParameter(":limit", limit)
-            );
+            return _dataContext
+                .LoadExtension("math")
+                .Movies.FromSqlRaw(
+                    """
+                    SELECT *, AVG(KwWeight) AS Weight
+                    FROM Movies,
+                         (
+                             SELECT r.KeywordId AS KeywordId,
+                                    r.Weight AS KwWeight,
+                                    l.MoviesId AS MovieId
+                             FROM KeywordMovie l
+                             INNER JOIN WeightedKeywords r
+                             ON l.KeywordsId = r.KeywordId
+                             WHERE r.ParentId = :rProfileId
+                         )
+                    WHERE Movies.Id = MovieId
+                    GROUP BY MovieId
+                    ORDER BY Weight * Weight DESC
+                    LIMIT :limit
+                    OFFSET :start
+                    """,
+                    new SqliteParameter(":rProfileId", user.RecommendationProfile.Id),
+                    new SqliteParameter(":start", start),
+                    new SqliteParameter(":limit", limit)
+                );
         }
 
         public async Task<IQueryable<Movie>> GetFriendMovies(User user)

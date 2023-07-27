@@ -26,10 +26,6 @@ public abstract class UnitTestBase
                     )
                     .UseLazyLoadingProxies()
         );
-        collection.AddSingleton<
-            IDatabaseExtensionsLoaderService,
-            SqliteDatabaseExtensionsLoaderService
-        >();
         collection.AddScoped<IProductionCompanyService, ProductionCompanyService>();
         collection.AddScoped<IMovieCollectionService, MovieCollectionService>();
         collection.AddScoped<IKeywordService, SqliteKeywordService>();

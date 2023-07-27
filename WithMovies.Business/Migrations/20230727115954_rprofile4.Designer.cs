@@ -11,8 +11,8 @@ using WithMovies.Business;
 namespace WithMovies.Business.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230727095933_testmigration")]
-    partial class testmigration
+    [Migration("20230727115954_rprofile4")]
+    partial class rprofile4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -509,6 +509,9 @@ namespace WithMovies.Business.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("CanReview")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
@@ -518,6 +521,9 @@ namespace WithMovies.Business.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsBlocked")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastLogin")
@@ -585,13 +591,13 @@ namespace WithMovies.Business.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("WithMovies.Domain.Models.WeightedMovie", b =>
+            modelBuilder.Entity("WithMovies.Domain.Models.WeightedKeywordId", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("MovieId")
+                    b.Property<int>("KeywordId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ParentId")
@@ -602,9 +608,11 @@ namespace WithMovies.Business.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("KeywordId");
+
                     b.HasIndex("ParentId");
 
-                    b.ToTable("WeightedMovies");
+                    b.ToTable("WeightedKeywords");
                 });
 
             modelBuilder.Entity("CastMemberMovie", b =>
@@ -784,13 +792,21 @@ namespace WithMovies.Business.Migrations
                     b.Navigation("RecommendationProfile");
                 });
 
-            modelBuilder.Entity("WithMovies.Domain.Models.WeightedMovie", b =>
+            modelBuilder.Entity("WithMovies.Domain.Models.WeightedKeywordId", b =>
                 {
+                    b.HasOne("WithMovies.Domain.Models.Keyword", "Keyword")
+                        .WithMany()
+                        .HasForeignKey("KeywordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WithMovies.Domain.Models.RecommendationProfile", "Parent")
-                        .WithMany("MovieWeights")
+                        .WithMany("KeywordWeights")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Keyword");
 
                     b.Navigation("Parent");
                 });
@@ -809,7 +825,7 @@ namespace WithMovies.Business.Migrations
                 {
                     b.Navigation("Inputs");
 
-                    b.Navigation("MovieWeights");
+                    b.Navigation("KeywordWeights");
                 });
 
             modelBuilder.Entity("WithMovies.Domain.Models.User", b =>

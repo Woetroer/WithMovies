@@ -12,6 +12,6 @@ namespace WithMovies.Domain.Interfaces
         Task Delete(User user);
         Task Block(User user);
         Task ReviewRights(User user);
-        Task AddPreferencesAsync(List<GenrePreference> preferences, User user);
+        Task AddPreferencesAsync(bool[] preferences, User user);
     }
 }

@@ -29,7 +29,7 @@ namespace WithMovies.Business.Services
             DateTime postedTime
         )
         {
-            Review reviewToAdd = new Review()
+            var reviewToAdd = new Review
             {
                 Author = user,
                 Movie = movie,
@@ -37,12 +37,16 @@ namespace WithMovies.Business.Services
                 Message = message,
                 PostedTime = postedTime
             };
-            await _dataContext.Reviews.AddAsync(reviewToAdd);
+
+            movie.VoteAverage =
+                ((movie.VoteAverage * movie.VoteCount) + rating) / ++movie.VoteCount;
+
+            _dataContext.Update(movie);
+            await _dataContext.AddAsync(reviewToAdd);
             await _dataContext.SaveChangesAsync();
         }
 
-        public async Task<Review?> Read(int id) =>
-            await _dataContext.Reviews.FirstOrDefaultAsync(p => p.Id == id);
+        public Task<Review?> Read(int id) => _dataContext.Reviews.FindAsync(id).AsTask();
 
         public async Task Update(Review review)
         {

@@ -22,6 +22,19 @@
       },
       "dotnetRunMessages": true
     },
+    "http-hugo": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://192.168.2.60:5186",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "LD_LIBRARY_PATH": "/",
+        "DYLD_LIBRARY_PATH": "/",
+        "PATH": "/"
+      },
+      "dotnetRunMessages": true
+    },
     "https": {
       "commandName": "Project",
       "launchBrowser": true,

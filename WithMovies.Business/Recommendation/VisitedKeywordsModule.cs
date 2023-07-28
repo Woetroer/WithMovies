@@ -10,6 +10,9 @@ public class VisitedKeywordsModule : RecommendationModule
         {
             foreach (var keyword in input.Movie.Keywords)
             {
+                if (keyword.Name == "duringcreditsstinger" || keyword.Name == "aftercreditsstinger")
+                    continue;
+
                 AddKeywordWeight(keyword, 0.1f);
             }
         }

@@ -69,8 +69,18 @@ namespace WithMovies.Business
                 .Entity<RecommendationProfile>()
                 .Property(p => p.ExplicitelyLikedGenres)
                 .HasConversion(
-                    v => v != null ? v.Select(b => b ? (byte)1 : (byte)0).ToArray() : new byte[20],
-                    v => v != null ? v.Select(b => b != 0).ToArray() : new bool[20]
+                    v =>
+                        v != null
+                            ? v.Select(b => b ? (byte)0xff : (byte)0).ToArray()
+                            : new byte[20]
+                                .Select(_ => (byte)0)
+                                .ToArray(),
+                    v =>
+                        v != null
+                            ? v.Select(b => b != 0).ToArray()
+                            : new bool[20]
+                                .Select(_ => false)
+                                .ToArray()
                 );
 
             modelBuilder.Entity<CastMember>().HasMany(m => m.Movies).WithMany(m => m.Cast);

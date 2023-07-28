@@ -56,7 +56,7 @@ namespace WithMovies.Business.UnitTests
                 RecommendationProfile = new RecommendationProfile { GenreWeights = new float[20], },
                 IsBlocked = false,
                 CanReview = true,
-                RefreshToken = null,
+                RefreshToken = "",
                 RefreshTokenExpiry = DateTime.Now
             };
 
@@ -72,7 +72,7 @@ namespace WithMovies.Business.UnitTests
                 CanReview = true,
                 RecommendationProfile = new RecommendationProfile { GenreWeights = new float[20], },
                 //Claim = "Admin"
-                RefreshToken = null,
+                RefreshToken = "",
                 RefreshTokenExpiry = DateTime.Now
             };
 

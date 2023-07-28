@@ -102,7 +102,7 @@ namespace WithMovies.WebApi.Controllers
                 },
                 IsBlocked = false,
                 CanReview = true,
-                RefreshToken = null,
+                RefreshToken = "",
                 RefreshTokenExpiry = DateTime.Now
             };
 

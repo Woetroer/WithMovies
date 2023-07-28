@@ -7,21 +7,54 @@ namespace WithMovies.Business.UnitTests;
 [Collection("Database Tests")]
 public class ReviewServiceTests : UnitTestBase<IReviewService>
 {
+    private User _author;
+    private Movie _movie;
+
     [Theory]
     [InlineData(1, "it was alright")]
     [InlineData(2, "it was okay")]
     [InlineData(3, "it was meh")]
-    public async Task TestLink(int id, string expected)
+    public async Task TestRead(int id, string expected)
     {
         var review = await _service.Read(id);
 
         Assert.Equal(review?.Message, expected);
     }
 
+    [Fact]
+    public async Task TestCreate()
+    {
+        await _service.Create(_author, _movie, 3.5, "average test", DateTime.Now);
+        var review = await _service.Read(4);
+
+        Assert.Equal(review.Message, "average test");
+    }
+
+    [Fact]
+    public async Task TestUpdate()
+    {
+        var review = await _service.Read(1);
+        review.Message = "actually a test";
+
+        await _service.Update(review);
+
+        var test = await _service.Read(1);
+        Assert.Equal(test.Message, "actually a test");
+    }
+
+    [Fact]
+    public async Task TestDelete()
+    {
+        await _service.Delete(1);
+
+        var test = await _service.Read(1);
+        Assert.Equal(test, null);
+    }
+
     // csharpier-ignore
     protected override Task SetupDatabase(DataContext context)
     {
-        var movie = new Movie
+        _movie = new Movie
         {
             Adult = false,
             Budget = 10000000,
@@ -47,7 +80,7 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
             SpokenLanguages = new List<string?>() { "zhi" },
         };
 
-        User author = new User
+        _author = new User
         {
             UserName = "Person",
             RecommendationProfile = new RecommendationProfile
@@ -61,37 +94,37 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
             CanReview = false,
         };
 
-        context.Add(movie);
-        context.Add(author);
+        context.Add(_movie);
+        context.Add(_author);
 
         context.Add(new Review
         {
             Id = 1,
-            Author = author,
+            Author = _author,
             Rating = 4.7,
             Message = "it was alright",
             PostedTime = new DateTime(2023, 07, 22),
-            Movie = movie,
+            Movie = _movie,
         });
 
         context.Add(new Review
         {
             Id = 2,
-            Author = author,
+            Author = _author,
             Rating = 4.3,
             Message = "it was okay",
             PostedTime = new DateTime(2023, 07, 22),
-            Movie = movie,
+            Movie = _movie,
         });
 
         context.Add(new Review
         {
             Id = 3,
-            Author = author,
+            Author = _author,
             Rating = 3.4,
             Message = "it was meh",
             PostedTime = new DateTime(2023, 07, 22),
-            Movie = movie,
+            Movie = _movie,
         });
 
         return Task.CompletedTask;

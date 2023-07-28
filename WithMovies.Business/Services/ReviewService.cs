@@ -13,9 +13,9 @@ namespace WithMovies.Business.Services
     public class ReviewService : IReviewService
     {
         private DataContext _dataContext;
-        private ILogger<MovieService> _logger;
+        private ILogger<IReviewService> _logger;
 
-        public ReviewService(DataContext dataContext, ILogger<MovieService> logger)
+        public ReviewService(DataContext dataContext, ILogger<IReviewService> logger)
         {
             _dataContext = dataContext;
             _logger = logger;

@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
+using WithMovies.Data.Sqlite;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
@@ -42,24 +44,21 @@ namespace WithMovies.Business.Services
         public required int VoteCount { get; set; }
     }
 
-    public class MovieService : IMovieService
+    public class SqliteMovieService : IMovieService
     {
-        private IMovieCollectionService _movieCollectionService;
-        private IProductionCompanyService _productionCompanyService;
-        private DataContext _dataContext;
-        private ILogger<MovieService> _logger;
+        private readonly DataContext _dataContext;
+        private readonly ILogger<SqliteMovieService> _logger;
+        private readonly IMovieCollectionService _movieCollectionService;
 
-        public MovieService(
+        public SqliteMovieService(
             DataContext dataContext,
             IMovieCollectionService movieCollectionService,
-            IProductionCompanyService productionCompanyService,
-            ILogger<MovieService> logger
+            ILogger<SqliteMovieService> logger
         )
         {
+            _logger = logger;
             _dataContext = dataContext;
             _movieCollectionService = movieCollectionService;
-            _productionCompanyService = productionCompanyService;
-            _logger = logger;
         }
 
         public async Task ImportJsonAsync(Stream json)
@@ -166,7 +165,59 @@ namespace WithMovies.Business.Services
         public Task<Movie?> GetByIdAsync(int movieId) =>
             _dataContext.Movies.Include(m => m.Keywords).FirstOrDefaultAsync(m => m.Id == movieId);
 
-        public Task<List<Movie>> GetPopularMovies() =>
-            _dataContext.Movies.OrderByDescending(movie => movie.VoteCount).Take(50).ToListAsync();
+        public async Task<IQueryable<Movie>> GetTrending(int start, int limit)
+        {
+            return _dataContext
+                .LoadExtension("math")
+                .Movies.FromSqlRaw(
+                    """
+                    SELECT * FROM Movies
+                    ORDER BY pow(VoteCount, VoteAverage) DESC
+                    LIMIT :limit
+                    OFFSET :start
+                    """,
+                    new SqliteParameter(":start", start),
+                    new SqliteParameter(":limit", limit)
+                );
+        }
+
+        public async Task<IQueryable<Movie>> GetTrending(User user, int start, int limit)
+        {
+            return _dataContext
+                .LoadExtension("math")
+                .Movies.FromSqlRaw(
+                    """
+                    SELECT *, AVG(KwWeight) AS Weight
+                    FROM Movies,
+                         (
+                             SELECT r.KeywordId AS KeywordId,
+                                    r.Weight AS KwWeight,
+                                    l.MoviesId AS MovieId
+                             FROM KeywordMovie l
+                             INNER JOIN WeightedKeywords r
+                             ON l.KeywordsId = r.KeywordId
+                             WHERE r.ParentId = :rProfileId
+                         )
+                    WHERE Movies.Id = MovieId
+                    GROUP BY MovieId
+                    ORDER BY Weight * Weight DESC
+                    LIMIT :limit
+                    OFFSET :start
+                    """,
+                    new SqliteParameter(":rProfileId", user.RecommendationProfile.Id),
+                    new SqliteParameter(":start", start),
+                    new SqliteParameter(":limit", limit)
+                );
+        }
+
+        public async Task<IQueryable<Movie>> GetFriendMovies(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IQueryable<Movie>> GetWatchList(User user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

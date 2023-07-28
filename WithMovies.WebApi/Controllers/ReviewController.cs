@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WithMovies.Business;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
-using WithMovies.WebApi.Dtos;
 using WithMovies.WebApi.Extensions;
 
 namespace WithMovies.WebApi.Controllers
@@ -15,16 +16,19 @@ namespace WithMovies.WebApi.Controllers
         private readonly IReviewService _reviewService;
         private readonly IMovieService _movieService;
         private readonly UserManager<User> _userManager;
+        private readonly DataContext _dataContext;
 
         public ReviewController(
             IReviewService reviewService,
             IMovieService movieService,
-            UserManager<User> userManager
+            UserManager<User> userManager,
+            DataContext dataContext
         )
         {
             _reviewService = reviewService;
             _movieService = movieService;
             _userManager = userManager;
+            _dataContext = dataContext;
         }
 
         public record ReviewToAdd(int MovieId, double Rating, string? Message);
@@ -61,7 +65,9 @@ namespace WithMovies.WebApi.Controllers
             if (movie == null)
                 return NotFound();
 
-            return Ok(movie.Reviews.Select(ReviewExtensions.ToDto));
+            return Ok(
+                movie.Reviews.AsQueryable().Include(r => r.Movie).Select(ReviewExtensions.ToDto)
+            );
         }
 
         public record UpdateArgs(int ReviewId, int MovieId, int Rating, string? Message);

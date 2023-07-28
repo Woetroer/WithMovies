@@ -91,7 +91,7 @@ namespace WithMovies.WebApi
                     name: MyAllowSpecificOrigins,
                     policy =>
                         policy
-                            .WithOrigins("http://localhost:4200")
+                            .WithOrigins("http://localhost:4200", "http://192.168.2.60:4200")
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials()

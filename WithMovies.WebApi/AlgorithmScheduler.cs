@@ -8,7 +8,11 @@ public class AlgorithmScheduler : BackgroundService
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<AlgorithmScheduler> _logger;
 
-    public AlgorithmScheduler(IConfiguration configuration, IServiceProvider serviceProvider, ILogger<AlgorithmScheduler> logger)
+    public AlgorithmScheduler(
+        IConfiguration configuration,
+        IServiceProvider serviceProvider,
+        ILogger<AlgorithmScheduler> logger
+    )
     {
         _configuration = configuration;
         _serviceProvider = serviceProvider;

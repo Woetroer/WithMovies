@@ -9,14 +9,19 @@ namespace WithMovies.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UserController : MyControllerBase
     {
         private readonly IUserService _userService;
         private readonly IMovieService _movieService;
         private readonly UserManager<User> _userManager;
         private DataContext _dataContext;
-        public UserController(IUserService userService, IMovieService movieService, UserManager<User> userManager, DataContext dataContext)
+
+        public UserController(
+            IUserService userService,
+            IMovieService movieService,
+            UserManager<User> userManager,
+            DataContext dataContext
+        )
         {
             _userService = userService;
             _movieService = movieService;
@@ -34,6 +39,10 @@ namespace WithMovies.WebApi.Controllers
 
             if (user.UserName == newUsername)
                 return Conflict("The new username should be unique");
+
+            var userByUsername = await _userManager.FindByNameAsync(newUsername);
+            if (userByUsername != null)
+                return Conflict("Username already exists");
 
             user.UserName = newUsername;
 
@@ -53,6 +62,10 @@ namespace WithMovies.WebApi.Controllers
             if (user.Email == newEmail)
                 return Conflict("The new email should be unique");
 
+            var userByEmail = await _userManager.FindByEmailAsync(newEmail);
+            if (userByEmail != null)
+                return Conflict("Email already exists");
+
             user.Email = newEmail;
 
             await _userManager.UpdateAsync(user);
@@ -62,7 +75,7 @@ namespace WithMovies.WebApi.Controllers
 
         public record Profile(string Email, string Username);
 
-        [HttpPost, Route("block"), Authorize(Roles = "Admin")]
+        [HttpPost("block"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> ToggleBlock(Profile profile)
         {
             var user = _userManager.Users
@@ -78,7 +91,7 @@ namespace WithMovies.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPost, Route("reviewright"), Authorize(Roles = "Admin")]
+        [HttpPost("reviewright"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> ToggleReviewRight(Profile profile)
         {
             var user = _userManager.Users.FirstOrDefault(
@@ -94,7 +107,7 @@ namespace WithMovies.WebApi.Controllers
             return Ok();
         }
 
-        [HttpDelete, Route("delete"), Authorize(Roles = "Admin")]
+        [HttpPost("delete"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(Profile profile)
         {
             var user = _userManager.Users

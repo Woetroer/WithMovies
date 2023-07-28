@@ -16,7 +16,7 @@ namespace WithMovies.Business
         public DbSet<ProductionCompany> ProductionCompanies { get; set; } = null!;
         public DbSet<RecommendationProfile> RecommendationProfiles { get; set; } = null!;
         public DbSet<RecommendationProfileInput> RecommendationProfileInputs { get; set; } = null!;
-        public DbSet<WeightedMovie> WeightedMovies { get; set; } = null!;
+        public DbSet<WeightedKeywordId> WeightedKeywords { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
 
         // Fake table, doesn't actually exist. This is used in KeywordService
@@ -67,10 +67,20 @@ namespace WithMovies.Business
 
             modelBuilder
                 .Entity<RecommendationProfile>()
-                .Property(p => p.ExplicitelyLikedGenres)
+                .Property(p => p.ExplicitlyLikedGenres)
                 .HasConversion(
-                    v => v != null ? v.Select(b => b ? (byte)1 : (byte)0).ToArray() : new byte[20],
-                    v => v != null ? v.Select(b => b != 0).ToArray() : new bool[20]
+                    v =>
+                        v != null
+                            ? v.Select(b => b ? (byte)0xff : (byte)0).ToArray()
+                            : new byte[20]
+                                .Select(_ => (byte)0)
+                                .ToArray(),
+                    v =>
+                        v != null
+                            ? v.Select(b => b != 0).ToArray()
+                            : new bool[20]
+                                .Select(_ => false)
+                                .ToArray()
                 );
 
             modelBuilder.Entity<CastMember>().HasMany(m => m.Movies).WithMany(m => m.Cast);
@@ -105,7 +115,7 @@ namespace WithMovies.Business
                 .WithOne(i => i.Parent);
             modelBuilder
                 .Entity<RecommendationProfile>()
-                .HasMany(p => p.MovieWeights)
+                .HasMany(p => p.KeywordWeights)
                 .WithOne(i => i.Parent);
 
             modelBuilder.Entity<KeywordRecord>().HasNoKey();

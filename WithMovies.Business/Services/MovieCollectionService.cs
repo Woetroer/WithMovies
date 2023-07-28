@@ -39,6 +39,7 @@ namespace WithMovies.Business.Services
             };
 
             await _dataContext.AddAsync(collection);
+            await _dataContext.SaveChangesAsync();
 
             return collection;
         }

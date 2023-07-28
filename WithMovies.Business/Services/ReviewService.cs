@@ -1,21 +1,21 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WithMovies.Domain.Models;
-using WithMovies.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using WithMovies.Domain.Interfaces;
+using WithMovies.Domain.Models;
 
 namespace WithMovies.Business.Services
 {
     public class ReviewService : IReviewService
     {
         private DataContext _dataContext;
-        private ILogger<MovieService> _logger;
+        private ILogger<IReviewService> _logger;
 
-        public ReviewService(DataContext dataContext, ILogger<MovieService> logger)
+        public ReviewService(DataContext dataContext, ILogger<IReviewService> logger)
         {
             _dataContext = dataContext;
             _logger = logger;
@@ -29,7 +29,7 @@ namespace WithMovies.Business.Services
             DateTime postedTime
         )
         {
-            Review reviewToAdd = new Review()
+            var reviewToAdd = new Review
             {
                 Author = user,
                 Movie = movie,
@@ -37,12 +37,16 @@ namespace WithMovies.Business.Services
                 Message = message,
                 PostedTime = postedTime
             };
-            await _dataContext.Reviews.AddAsync(reviewToAdd);
+
+            movie.VoteAverage =
+                ((movie.VoteAverage * movie.VoteCount) + rating) / ++movie.VoteCount;
+
+            _dataContext.Update(movie);
+            await _dataContext.AddAsync(reviewToAdd);
             await _dataContext.SaveChangesAsync();
         }
 
-        public async Task<Review?> Read(int id) =>
-            await _dataContext.Reviews.FirstOrDefaultAsync(p => p.Id == id);
+        public Task<Review?> Read(int id) => _dataContext.Reviews.FindAsync(id).AsTask();
 
         public async Task Update(Review review)
         {

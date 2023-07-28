@@ -45,22 +45,13 @@ namespace WithMovies.WebApi.Extensions
             return dto;
         }
 
-        public static List<PreviewDto> ToPreviewDto(this List<Movie> movies)
+        public static PreviewDto ToPreviewDto(Movie movie) => new()
         {
-            List<PreviewDto> dtos = new();
-            foreach (Movie movie in movies)
-            {
-                PreviewDto dto = new PreviewDto()
-                {
-                    Id = movie.Id,
-                    Title = movie.Title,
-                    PosterPath = movie.PosterPath,
-                    Tagline = movie.Tagline
-                };
-                dtos.Add(dto);
-            }
-            return dtos;
-        }
+            Id = movie.Id,
+            Title = movie.Title,
+            PosterPath = movie.PosterPath,
+            Tagline = movie.Tagline,
+        };
     }
 }
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WithMovies.Business;
 
@@ -10,9 +11,16 @@ using WithMovies.Business;
 namespace WithMovies.Business.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+<<<<<<<< HEAD:WithMovies.Business/Migrations/20230727101959_DefinitelyNotInitialCreate.Designer.cs
+    [Migration("20230727101959_DefinitelyNotInitialCreate")]
+    partial class DefinitelyNotInitialCreate
+========
+    [Migration("20230727103845_rprofile3")]
+    partial class rprofile3
+>>>>>>>> development:WithMovies.Business/Migrations/20230727103845_rprofile3.Designer.cs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

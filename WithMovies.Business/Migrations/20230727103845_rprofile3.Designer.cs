@@ -11,13 +11,8 @@ using WithMovies.Business;
 namespace WithMovies.Business.Migrations
 {
     [DbContext(typeof(DataContext))]
-<<<<<<<< HEAD:WithMovies.Business/Migrations/20230727101959_DefinitelyNotInitialCreate.Designer.cs
-    [Migration("20230727101959_DefinitelyNotInitialCreate")]
-    partial class DefinitelyNotInitialCreate
-========
     [Migration("20230727103845_rprofile3")]
     partial class rprofile3
->>>>>>>> development:WithMovies.Business/Migrations/20230727103845_rprofile3.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

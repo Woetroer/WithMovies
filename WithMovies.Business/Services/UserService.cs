@@ -1,10 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WithMovies.Domain.Interfaces;
+﻿using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 
 namespace WithMovies.Business.Services
@@ -35,7 +29,7 @@ namespace WithMovies.Business.Services
 
         public Task SetPreferencesAsync(bool[] preferences, User user)
         {
-            user.RecommendationProfile.ExplicitelyLikedGenres = preferences;
+            user.RecommendationProfile.ExplicitlyLikedGenres = preferences;
 
             _dataContext.Update(user.RecommendationProfile);
 

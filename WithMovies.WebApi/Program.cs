@@ -40,6 +40,7 @@ namespace WithMovies.WebApi
             builder.Services.AddScoped<IKeywordService, SqliteKeywordService>();
             builder.Services.AddScoped<ICreditsService, CreditsService>();
             builder.Services.AddScoped<IMovieService, SqliteMovieService>();
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddHostedService<AlgorithmScheduler>();
             builder.Services.AddLogging(
                 x =>

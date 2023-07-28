@@ -13,11 +13,31 @@ public class UserServiceTests : UnitTestBase<IUserService>
     [Fact]
     public async Task TestAddPreferences()
     {
-        _genrePreference = new bool[] {true, false, true, false , true, false , true, false , true, false,
-        true, false, true, false , true, false , true, false , true, false};
-        
+        _genrePreference = new bool[]
+        {
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false
+        };
 
-        await _service.AddPreferencesAsync(_genrePreference, _user);
+        await _service.SetPreferencesAsync(_genrePreference, _user);
 
         Assert.Equal(_user.RecommendationProfile.ExplicitelyLikedGenres[0], true);
     }

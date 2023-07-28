@@ -12,11 +12,11 @@ namespace WithMovies.Business.Services
     public class UserService : IUserService
     {
         private DataContext _dataContext;
+
         public UserService(DataContext dataContext)
         {
             _dataContext = dataContext;
         }
-
 
         public async Task Block(User user)
         {
@@ -26,7 +26,6 @@ namespace WithMovies.Business.Services
         public async Task Delete(User user)
         {
             _dataContext.Users.Remove(user);
-
         }
 
         public async Task ReviewRights(User user)
@@ -34,13 +33,13 @@ namespace WithMovies.Business.Services
             user.CanReview = !user.CanReview;
         }
 
-        public async Task AddPreferencesAsync(bool[] preferences, User user)
+        public Task SetPreferencesAsync(bool[] preferences, User user)
         {
-            User preferencesToSet = _dataContext.Users.Where(u => u.UserName == user.UserName).FirstOrDefault();
-            preferencesToSet.RecommendationProfile.ExplicitelyLikedGenres = preferences;
+            user.RecommendationProfile.ExplicitelyLikedGenres = preferences;
 
-            _dataContext.Users.Update(preferencesToSet);
-            await _dataContext.SaveChangesAsync();
+            _dataContext.Update(user.RecommendationProfile);
+
+            return Task.CompletedTask;
         }
     }
 }

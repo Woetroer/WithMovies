@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyModel;
+using WithMovies.Business;
 using WithMovies.Business.Services;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
@@ -15,17 +16,31 @@ namespace WithMovies.WebApi.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
-        public RecommendationsController(UserManager<User> userManager, IUserService userService)
+        private readonly DataContext _dataContext;
+
+        public RecommendationsController(UserManager<User> userManager, IUserService userService, DataContext dataContext)
         {
             _userManager = userManager;
             _userService = userService;
+            _dataContext = dataContext;
         }
 
-        [Route("recommendation/preferences")]
-        [HttpGet]
-        public async Task<IActionResult> GetUserPreferences(bool[] preferences)
+        public record UserPreferencesArray(bool[] Preferences, bool Adult);
+
+        [HttpPost("preferences")]
+        public async Task<IActionResult> SetUserPreferences(UserPreferencesArray prefs)
         {
-            await _userService.AddPreferencesAsync(preferences, _userManager.Users.First(x => x.UserName == User.Identity!.Name!));
+            var user = await _userManager.FindByIdAsync(UserId);
+
+            if (user == null)
+                return Unauthorized();
+            
+            await _userService.SetPreferencesAsync(
+                prefs.Preferences,
+                user
+            );
+            await _dataContext.SaveChangesAsync();
+
             return Ok();
         }
     }

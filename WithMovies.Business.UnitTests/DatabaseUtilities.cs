@@ -55,7 +55,9 @@ namespace WithMovies.Business.UnitTests
                 Reviews = new List<Review>(),
                 RecommendationProfile = new RecommendationProfile { GenreWeights = new float[20], },
                 IsBlocked = false,
-                CanReview = true
+                CanReview = true,
+                RefreshToken = null,
+                RefreshTokenExpiry = DateTime.Now
             };
 
             TestAdmin = new User
@@ -70,6 +72,8 @@ namespace WithMovies.Business.UnitTests
                 CanReview = true,
                 RecommendationProfile = new RecommendationProfile { GenreWeights = new float[20], },
                 //Claim = "Admin"
+                RefreshToken = null,
+                RefreshTokenExpiry = DateTime.Now
             };
 
             TestMovie1 = new Movie

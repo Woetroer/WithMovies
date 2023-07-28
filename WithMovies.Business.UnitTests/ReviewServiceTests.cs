@@ -59,6 +59,8 @@ public class ReviewServiceTests : UnitTestBase<IReviewService>
             Reviews = new List<Review>() { },
             IsBlocked = false,
             CanReview = false,
+            RefreshToken = null,
+            RefreshTokenExpiry = DateTime.Now
         };
 
         context.Add(movie);

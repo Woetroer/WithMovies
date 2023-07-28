@@ -101,7 +101,9 @@ namespace WithMovies.WebApi.Controllers
                     GenreWeights = new float[20],
                 },
                 IsBlocked = false,
-                CanReview = true
+                CanReview = true,
+                RefreshToken = null,
+                RefreshTokenExpiry = DateTime.Now
             };
 
             // Create user

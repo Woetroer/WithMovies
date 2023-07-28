@@ -1,3 +1,15 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using WithMovies.Business;
+using WithMovies.Business.Services;
+using WithMovies.Data.Sqlite;
+using WithMovies.Domain.Interfaces;
+using WithMovies.Domain.Models;
+
 namespace WithMovies.WebApi
 {
     public class Program

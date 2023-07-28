@@ -1,4 +1,14 @@
-﻿namespace WithMovies.WebApi.Controllers
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyModel;
+using WithMovies.Business;
+using WithMovies.Business.Services;
+using WithMovies.Domain.Interfaces;
+using WithMovies.Domain.Models;
+using WithMovies.WebApi.Models;
+
+namespace WithMovies.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -24,7 +34,7 @@
 
             if (user == null)
                 return Unauthorized();
-
+            
             await _userService.SetPreferencesAsync(
                 prefs.Preferences,
                 user

@@ -1,8 +1,4 @@
-﻿using Iso639;
-using J2N;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Security.Policy;
+﻿using Microsoft.EntityFrameworkCore;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Models;
 
@@ -339,7 +335,7 @@ namespace WithMovies.Business.UnitTests
             TestRecommendation1 = new RecommendationProfile
             {
                 Id = 0,
-                ExplicitlyLikedGenres = new bool[20],
+                ExplicitelyLikedGenres = new bool[20],
                 GenreWeights = new float[20],
             };
         }

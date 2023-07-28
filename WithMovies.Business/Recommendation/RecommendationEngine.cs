@@ -48,7 +48,7 @@ public class RecommendationEngine
         {
             for (int i = 0; i < 20; i++)
             {
-                module.ProcessGenre((Genre)i, _target.ExplicitlyLikedGenres[i]);
+                module.ProcessGenre((Genre)i, _target.ExplicitelyLikedGenres[i]);
             }
 
             foreach (var input in _inputs)

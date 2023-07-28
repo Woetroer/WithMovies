@@ -4,8 +4,8 @@ namespace WithMovies.WebApi;
 
 public class AlgorithmScheduler : BackgroundService
 {
-    private IConfiguration _configuration;
-    private IServiceProvider _serviceProvider;
+    private readonly IConfiguration _configuration;
+    private readonly IServiceProvider _serviceProvider;
 
     public AlgorithmScheduler(IConfiguration configuration, IServiceProvider serviceProvider)
     {

@@ -1,8 +1,4 @@
-﻿using Iso639;
-using J2N;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Security.Policy;
+﻿using Microsoft.EntityFrameworkCore;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Models;
 

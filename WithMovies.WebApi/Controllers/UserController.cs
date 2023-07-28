@@ -40,6 +40,10 @@ namespace WithMovies.WebApi.Controllers
             if (user.UserName == newUsername)
                 return Conflict("The new username should be unique");
 
+            var userByUsername = await _userManager.FindByNameAsync(newUsername);
+            if (userByUsername != null)
+                return Conflict("Username already exists");
+
             user.UserName = newUsername;
 
             await _userManager.UpdateAsync(user);
@@ -57,6 +61,10 @@ namespace WithMovies.WebApi.Controllers
 
             if (user.Email == newEmail)
                 return Conflict("The new email should be unique");
+
+            var userByEmail = await _userManager.FindByEmailAsync(newEmail);
+            if (userByEmail != null)
+                return Conflict("Email already exists");
 
             user.Email = newEmail;
 

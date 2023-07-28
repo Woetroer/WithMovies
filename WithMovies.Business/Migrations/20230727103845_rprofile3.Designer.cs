@@ -428,7 +428,7 @@ namespace WithMovies.Business.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("ExplicitelyLikedGenres")
+                    b.Property<byte[]>("ExplicitlyLikedGenres")
                         .IsRequired()
                         .HasColumnType("BLOB");
 

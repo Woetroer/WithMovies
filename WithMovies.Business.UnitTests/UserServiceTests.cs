@@ -42,6 +42,28 @@ public class UserServiceTests : UnitTestBase<IUserService>
         Assert.Equal(_user.RecommendationProfile.ExplicitelyLikedGenres[0], true);
     }
 
+    [Fact]
+    public async Task TestBlock()
+    {
+        await _service.Block(_user);
+        Assert.Equal(true, _user.IsBlocked);
+    }
+
+    [Fact]
+    public async Task TestReviewRights()
+    {
+        await _service.ReviewRights(_user);
+        Assert.Equal(true, _user.CanReview);
+    }
+
+    [Fact]
+    public async Task TestDelete()
+    {
+        await _service.Delete(_user);
+        var user = _service.GetByName("Person");
+        Assert.Equal(null, user);
+    }
+
     // csharpier-ignore
     protected override Task SetupDatabase(DataContext context)
     {
@@ -82,7 +104,7 @@ public class UserServiceTests : UnitTestBase<IUserService>
             Watchlist = new List<Movie>() { },
             Reviews = new List<Review>() { },
             IsBlocked = false,
-            CanReview = false,
+            CanReview = false
         };
 
         context.Add(movie);

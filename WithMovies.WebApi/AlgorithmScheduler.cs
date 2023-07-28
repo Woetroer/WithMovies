@@ -4,13 +4,15 @@ namespace WithMovies.WebApi;
 
 public class AlgorithmScheduler : BackgroundService
 {
-    private IConfiguration _configuration;
-    private IServiceProvider _serviceProvider;
+    private readonly IConfiguration _configuration;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<AlgorithmScheduler> _logger;
 
-    public AlgorithmScheduler(IConfiguration configuration, IServiceProvider serviceProvider)
+    public AlgorithmScheduler(IConfiguration configuration, IServiceProvider serviceProvider, ILogger<AlgorithmScheduler> logger)
     {
         _configuration = configuration;
         _serviceProvider = serviceProvider;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -23,7 +25,14 @@ public class AlgorithmScheduler : BackgroundService
             var scope = _serviceProvider.CreateAsyncScope();
             var service = scope.ServiceProvider.GetRequiredService<IRecommendationService>();
 
-            await service.RunRecommendationEngine();
+            try
+            {
+                await service.RunRecommendationEngine();
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical(e.ToString());
+            }
         }
     }
 }

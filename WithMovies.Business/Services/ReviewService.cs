@@ -1,21 +1,21 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WithMovies.Domain.Models;
-using WithMovies.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using WithMovies.Domain.Interfaces;
+using WithMovies.Domain.Models;
 
 namespace WithMovies.Business.Services
 {
     public class ReviewService : IReviewService
     {
         private DataContext _dataContext;
-        private ILogger<MovieService> _logger;
+        private ILogger<IReviewService> _logger;
 
-        public ReviewService(DataContext dataContext, ILogger<MovieService> logger)
+        public ReviewService(DataContext dataContext, ILogger<IReviewService> logger)
         {
             _dataContext = dataContext;
             _logger = logger;

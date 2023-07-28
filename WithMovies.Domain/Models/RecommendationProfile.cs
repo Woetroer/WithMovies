@@ -27,9 +27,9 @@
         // Outputs
 
         /// <summary>
-        /// A list of recommended movies and how much they are recommended
+        /// A list of recommended keywords and how much they are recommended
         /// </summary>
-        public virtual ICollection<WeightedMovie> MovieWeights { get; set; } = null!;
+        public virtual ICollection<WeightedKeywordId> KeywordWeights { get; set; } = null!;
 
         /// <summary>
         /// How much the user likes specific genres. Every value is a float

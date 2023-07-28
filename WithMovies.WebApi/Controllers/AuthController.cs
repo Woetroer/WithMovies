@@ -97,7 +97,7 @@ namespace WithMovies.WebApi.Controllers
                 {
                     Inputs = new List<RecommendationProfileInput>(),
                     ExplicitelyLikedGenres = new bool[20],
-                    MovieWeights = new List<WeightedMovie>(),
+                    KeywordWeights = new List<WeightedKeywordId>(),
                     GenreWeights = new float[20],
                 },
                 IsBlocked = false,

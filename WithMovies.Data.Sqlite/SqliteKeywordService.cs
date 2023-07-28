@@ -15,7 +15,6 @@ namespace WithMovies.Data.Sqlite
     public class SqliteKeywordService : IKeywordService
     {
         private DataContext _dataContext;
-        private IDatabaseExtensionsLoaderService _databaseExtensionsLoader;
         private ILogger<SqliteKeywordService> _logger;
 
         private static string BasePath = Path.GetDirectoryName(
@@ -25,15 +24,10 @@ namespace WithMovies.Data.Sqlite
             Path.Combine(BasePath, "sql/suggest-keywords.sql")
         );
 
-        public SqliteKeywordService(
-            DataContext dataContext,
-            ILogger<SqliteKeywordService> logger,
-            IDatabaseExtensionsLoaderService databaseExtensionsLoader
-        )
+        public SqliteKeywordService(DataContext dataContext, ILogger<SqliteKeywordService> logger)
         {
             _dataContext = dataContext;
             _logger = logger;
-            _databaseExtensionsLoader = databaseExtensionsLoader;
         }
 
         public async Task ImportJsonAsync(Stream json)
@@ -55,7 +49,7 @@ namespace WithMovies.Data.Sqlite
 
                 if (iteration % 500 == 0)
                 {
-                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
                     _logger.LogInformation($"{progressBar} Adding keywords");
                 }
 
@@ -75,9 +69,10 @@ namespace WithMovies.Data.Sqlite
 
         public async Task<List<string>> FindKeywords(string text)
         {
-            await _databaseExtensionsLoader.EnsureLoaded("fuzzy");
-            await _databaseExtensionsLoader.EnsureLoaded("text");
-            await _dataContext.Database.BeginTransactionAsync();
+            await _dataContext
+                .LoadExtension("fuzzy")
+                .LoadExtension("text")
+                .Database.BeginTransactionAsync();
 
             var script = BuildFindKeywordsScript(text.Count(c => c == ' ') + 1);
 
@@ -90,9 +85,10 @@ namespace WithMovies.Data.Sqlite
 
         public async Task<List<KeywordSuggestion>> FindKeywordSuggestions(string text)
         {
-            await _databaseExtensionsLoader.EnsureLoaded("fuzzy");
-            await _databaseExtensionsLoader.EnsureLoaded("text");
-            await _dataContext.Database.BeginTransactionAsync();
+            await _dataContext
+                .LoadExtension("fuzzy")
+                .LoadExtension("text")
+                .Database.BeginTransactionAsync();
 
             var script = BuildSuggestKeywordsScript(text.Count(c => c == ' ') + 1, 0.85f);
 

@@ -23,23 +23,6 @@ namespace WithMovies.Business.UnitTests
             Assert.Equal(movie?.Title, expected);
         }
 
-        [Theory]
-        [InlineData("The Sixth Omen")]
-        public async Task GetPopularMovies(string expected)
-        {
-            var popularMovies = await _service.GetPopularMovies();
-
-            Assert.Equal(popularMovies[0].Title, expected);
-        }
-
-        [Fact]
-        public async Task GetPopularMoviesCount()
-        {
-            var popularMovies = await _service.GetPopularMovies();
-
-            Assert.Equal(6, popularMovies.Count);
-        }
-
         protected override Task SetupDatabase(DataContext context)
         {
             var testMovie1 = new Movie

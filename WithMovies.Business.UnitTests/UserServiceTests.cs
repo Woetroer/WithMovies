@@ -83,6 +83,8 @@ public class UserServiceTests : UnitTestBase<IUserService>
             Reviews = new List<Review>() { },
             IsBlocked = false,
             CanReview = false,
+            RefreshToken = "",
+            RefreshTokenExpiry = DateTime.Now
         };
 
         context.Add(movie);

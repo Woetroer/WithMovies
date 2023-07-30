@@ -75,7 +75,7 @@ public class UserServiceTests : UnitTestBase<IUserService>
     {
         var name = _user.UserName;
         await _service.Delete(_user);
-        Assert.Null(_service.GetByName(name));
+        Assert.Null(_service.GetByName(name).Result);
     }
 
     // csharpier-ignore
@@ -118,7 +118,9 @@ public class UserServiceTests : UnitTestBase<IUserService>
             Watchlist = new List<Movie>() { },
             Reviews = new List<Review>() { },
             IsBlocked = false,
-            CanReview = false
+            CanReview = false,
+            RefreshToken = "refresh",
+            RefreshTokenExpiry = DateTime.Now.AddHours(1)
         };
 
         _user2 = new User
@@ -132,7 +134,9 @@ public class UserServiceTests : UnitTestBase<IUserService>
             Watchlist = new List<Movie>() { },
             Reviews = new List<Review>() { },
             IsBlocked = false,
-            CanReview = true
+            CanReview = true,
+            RefreshToken = "refresh",
+            RefreshTokenExpiry = DateTime.Now.AddHours(1)
         };
 
         context.Add(movie);

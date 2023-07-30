@@ -43,10 +43,16 @@ namespace WithMovies.Business.Services
             return Task.CompletedTask;
         }
 
-        public User? GetByName(string name)
+        public async Task<User?> GetByName(string name)
         {
-            var user = _dataContext.Users.Where(n => n.UserName == name).First();
+            var user = await _dataContext.Users.Where(n => n.UserName == name).FirstOrDefaultAsync();
             return user;
+        }
+
+        public async Task<List<User>> GetAll()
+        {
+            var users = await _dataContext.Users.ToListAsync();
+            return users;
         }
     }
 }

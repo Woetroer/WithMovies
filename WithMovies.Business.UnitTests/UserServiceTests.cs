@@ -9,6 +9,20 @@ public class UserServiceTests : UnitTestBase<IUserService>
 {
     private bool[] _genrePreference;
     private User _user;
+    private User _user2;
+
+
+    [Fact]
+    public async Task TestGetByName()
+    {
+        Assert.Equal(_user.UserName, _service.GetByName("Person").Result.UserName);
+    }
+
+    [Fact]
+    public async Task TestGetAll()
+    {
+        Assert.Equal(2, _service.GetAll().Result.Count);
+    }
 
     [Fact]
     public async Task TestAddPreferences()
@@ -59,9 +73,9 @@ public class UserServiceTests : UnitTestBase<IUserService>
     [Fact]
     public async Task TestDelete()
     {
+        var name = _user.UserName;
         await _service.Delete(_user);
-        var user = _service.GetByName("Person");
-        Assert.Equal(null, user);
+        Assert.Null(_service.GetByName(name));
     }
 
     // csharpier-ignore
@@ -107,8 +121,24 @@ public class UserServiceTests : UnitTestBase<IUserService>
             CanReview = false
         };
 
+        _user2 = new User
+        {
+            UserName = "Person2",
+            RecommendationProfile = new RecommendationProfile
+            {
+                GenreWeights = new float[20],
+            },
+            Friends = new List<User>() { },
+            Watchlist = new List<Movie>() { },
+            Reviews = new List<Review>() { },
+            IsBlocked = false,
+            CanReview = true
+        };
+
         context.Add(movie);
         context.Add(_user);
+        context.Add(_user2);
+
 
         context.Add(new Review
         {

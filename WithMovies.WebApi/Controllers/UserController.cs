@@ -122,5 +122,27 @@ namespace WithMovies.WebApi.Controllers
 
             return Ok();
         }
+
+        [HttpGet("users-most-reviews/{amount}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UsersWithMostReviews(int amount)
+        {
+            var user = await _userManager.FindByIdAsync(UserId);
+
+            if (user == null)
+                return Unauthorized();
+
+            return Ok(await _userService.MostActiveUsers(amount));
+        }
+
+        [HttpGet("avg-reviews"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AverageReviews()
+        {
+            var user = await _userManager.FindByIdAsync(UserId);
+
+            if (user == null)
+                return Unauthorized();
+
+            return Ok(await _userService.AverageReviewsPerUser());
+        }
     }
 }

@@ -57,16 +57,16 @@ namespace WithMovies.Business.Services
             return users;
         }
 
-        public async Task<List<User>> TopTenMostActiveUsers()
+        public async Task<List<User>> MostActiveUsers(int amount)
         {
-            var users = await _dataContext.Users.OrderByDescending(n => n.Reviews.Count).Take(10).ToListAsync();
+            var users = await _dataContext.Users.OrderByDescending(n => n.Reviews.Count).Take(amount).ToListAsync();
             return users;
         }
 
-        public async Task<float> AverageActivity()
+        public async Task<float> AverageReviewsPerUser()
         {
-            float users = _dataContext.Users.Count();
-            float reviews = _dataContext.Reviews.Count();
+            float users = await _dataContext.Users.CountAsync();
+            float reviews = await _dataContext.Reviews.CountAsync ();
 
             float average = reviews / users;
             return average;

@@ -116,7 +116,7 @@ namespace WithMovies.Business.Services
 
                 if (iteration % 500 == 0)
                 {
-                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
                     _logger.LogInformation($"{progressBar} Adding movies");
                 }
 
@@ -213,29 +213,11 @@ namespace WithMovies.Business.Services
 
         public async Task<List<int>> GetTrendingGenres(int start, int limit)
         {
-            List<int> genres = new();
-            List<Movie> movies = _dataContext
-                .LoadExtension("math")
-                .Movies.FromSqlRaw(
-                    """
-                    SELECT * FROM Movies
-                    ORDER BY pow(VoteCount, VoteAverage) DESC
-                    LIMIT :limit
-                    OFFSET :start
-                    """,
-                    new SqliteParameter(":start", start),
-                    new SqliteParameter(":limit", limit)
-                ).ToList();
-
-            foreach(Movie movie in movies)
-            {
-                foreach(Genre genre in  movie.Genres)
-                {
-                    if (!genres.Contains((int)genre))
-                        genres.Add((int)genre);
-                }
-            }
-            return genres;
+            return await (await GetTrending(start, limit))
+                .SelectMany(m => m.Genres)
+                .Distinct()
+                .Cast<int>()
+                .ToListAsync();
         }
 
         public async Task<IQueryable<Movie>> GetFriendMovies(User user)

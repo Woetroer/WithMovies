@@ -21,7 +21,9 @@ public class UserServiceTests : UnitTestBase<IUserService>
     [Fact]
     public async Task TestGetAll()
     {
-        Assert.Equal(2, _service.GetAll().Result.Count);
+        var users = _service.GetAll().Result;
+        Assert.Equal(2, users.Count);
+        Assert.Equal(users[0].UserName, "Person");
     }
 
     [Fact]
@@ -78,9 +80,25 @@ public class UserServiceTests : UnitTestBase<IUserService>
         Assert.Null(_service.GetByName(name).Result);
     }
 
+    [Fact]
+    public async Task TestOrderByReviews()
+    {
+        var users = _service.TopTenMostActiveUsers().Result;
+
+        Assert.Equal(users.Count, 2);
+        Assert.Equal(users[0].UserName, "Person");
+    }
+
+    [Fact]
+    public async Task TestAverageReviews()
+    {
+        Assert.Equal(1.5, _service.AverageActivity().Result);
+    }
+
     // csharpier-ignore
     protected override Task SetupDatabase(DataContext context)
     {
+        
         var movie = new Movie
         {
             Adult = false,

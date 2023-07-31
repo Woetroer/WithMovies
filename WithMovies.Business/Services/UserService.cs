@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
+using Microsoft.Data.Sqlite;
+
 
 namespace WithMovies.Business.Services
 {
@@ -53,6 +55,21 @@ namespace WithMovies.Business.Services
         {
             var users = await _dataContext.Users.ToListAsync();
             return users;
+        }
+
+        public async Task<List<User>> TopTenMostActiveUsers()
+        {
+            var users = await _dataContext.Users.OrderByDescending(n => n.Reviews.Count).Take(10).ToListAsync();
+            return users;
+        }
+
+        public async Task<float> AverageActivity()
+        {
+            float users = _dataContext.Users.Count();
+            float reviews = _dataContext.Reviews.Count();
+
+            float average = reviews / users;
+            return average;
         }
     }
 }

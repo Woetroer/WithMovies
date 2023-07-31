@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Linq;
+using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -115,7 +116,7 @@ namespace WithMovies.Business.Services
 
                 if (iteration % 500 == 0)
                 {
-                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
                     _logger.LogInformation($"{progressBar} Adding movies");
                 }
 
@@ -208,6 +209,15 @@ namespace WithMovies.Business.Services
                     new SqliteParameter(":start", start),
                     new SqliteParameter(":limit", limit)
                 );
+        }
+
+        public async Task<List<int>> GetTrendingGenres(int start, int limit)
+        {
+            return await (await GetTrending(start, limit))
+                .SelectMany(m => m.Genres)
+                .Distinct()
+                .Cast<int>()
+                .ToListAsync();
         }
 
         public async Task<IQueryable<Movie>> GetFriendMovies(User user)

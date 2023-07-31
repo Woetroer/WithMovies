@@ -26,7 +26,7 @@ namespace WithMovies.Business.UnitTests
         [Fact]
         public async Task TestGetTrending()
         {
-            var movies = _service.GetTrending(0, 6).Result.ToList();
+            var movies = (await _service.GetTrending(0, 6)).ToList();
 
             Assert.Equal("Electric Boogalu!", movies[0].Title);
             Assert.Equal("Fourth time's the charm...", movies[5].Title);
@@ -35,7 +35,7 @@ namespace WithMovies.Business.UnitTests
         [Fact]
         public async Task TestGetTrendingGenres()
         {
-            var genres = _service.GetTrendingGenres(0, 6).Result;
+            var genres = await _service.GetTrendingGenres(0, 6);
 
             Assert.Equal(18, genres[0]);
             Assert.Equal(6, genres.Count);

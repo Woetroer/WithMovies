@@ -28,4 +28,10 @@
     <ProjectReference Include="..\WithMovies.Domain\WithMovies.Domain.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Content Include="sqlite-extensions/*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
 </Project>

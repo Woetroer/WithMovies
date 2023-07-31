@@ -26,6 +26,7 @@ namespace WithMovies.Business.Services
         public async Task Delete(User user)
         {
             _dataContext.Users.Remove(user);
+            await _dataContext.SaveChangesAsync();
         }
 
         public async Task ReviewRights(User user)
@@ -40,6 +41,18 @@ namespace WithMovies.Business.Services
             _dataContext.Update(user.RecommendationProfile);
 
             return Task.CompletedTask;
+        }
+
+        public async Task<User?> GetByName(string name)
+        {
+            var user = await _dataContext.Users.Where(n => n.UserName == name).FirstOrDefaultAsync();
+            return user;
+        }
+
+        public async Task<List<User>> GetAll()
+        {
+            var users = await _dataContext.Users.ToListAsync();
+            return users;
         }
     }
 }

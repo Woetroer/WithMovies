@@ -13,5 +13,8 @@ namespace WithMovies.Domain.Interfaces
         Task Block(User user);
         Task ReviewRights(User user);
         Task SetPreferencesAsync(bool[] preferences, User user);
+        Task<User?> GetByName(string name);
+        Task<List<User>> GetAll();
+
     }
 }

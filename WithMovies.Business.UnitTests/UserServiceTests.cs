@@ -9,6 +9,20 @@ public class UserServiceTests : UnitTestBase<IUserService>
 {
     private bool[] _genrePreference;
     private User _user;
+    private User _user2;
+
+
+    [Fact]
+    public async Task TestGetByName()
+    {
+        Assert.Equal(_user.UserName, _service.GetByName("Person").Result.UserName);
+    }
+
+    [Fact]
+    public async Task TestGetAll()
+    {
+        Assert.Equal(2, _service.GetAll().Result.Count);
+    }
 
     [Fact]
     public async Task TestAddPreferences()
@@ -40,6 +54,28 @@ public class UserServiceTests : UnitTestBase<IUserService>
         await _service.SetPreferencesAsync(_genrePreference, _user);
 
         Assert.Equal(_user.RecommendationProfile.ExplicitelyLikedGenres[0], true);
+    }
+
+    [Fact]
+    public async Task TestBlock()
+    {
+        await _service.Block(_user);
+        Assert.Equal(true, _user.IsBlocked);
+    }
+
+    [Fact]
+    public async Task TestReviewRights()
+    {
+        await _service.ReviewRights(_user);
+        Assert.Equal(true, _user.CanReview);
+    }
+
+    [Fact]
+    public async Task TestDelete()
+    {
+        var name = _user.UserName;
+        await _service.Delete(_user);
+        Assert.Null(_service.GetByName(name).Result);
     }
 
     // csharpier-ignore
@@ -83,12 +119,30 @@ public class UserServiceTests : UnitTestBase<IUserService>
             Reviews = new List<Review>() { },
             IsBlocked = false,
             CanReview = false,
-            RefreshToken = "",
-            RefreshTokenExpiry = DateTime.Now
+            RefreshToken = "refresh",
+            RefreshTokenExpiry = DateTime.Now.AddHours(1)
+        };
+
+        _user2 = new User
+        {
+            UserName = "Person2",
+            RecommendationProfile = new RecommendationProfile
+            {
+                GenreWeights = new float[20],
+            },
+            Friends = new List<User>() { },
+            Watchlist = new List<Movie>() { },
+            Reviews = new List<Review>() { },
+            IsBlocked = false,
+            CanReview = true,
+            RefreshToken = "refresh",
+            RefreshTokenExpiry = DateTime.Now.AddHours(1)
         };
 
         context.Add(movie);
         context.Add(_user);
+        context.Add(_user2);
+
 
         context.Add(new Review
         {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WithMovies.Business;
+using WithMovies.Domain;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Dtos;
@@ -113,6 +114,70 @@ namespace WithMovies.WebApi.Controllers
             await _dataContext.SaveChangesAsync();
 
             return Ok(movie.ToDto());
+        }
+
+        public class SearchQueryInput
+        {
+            public required string RawText { get; set; }
+            public required string[] Include { get; set; }
+            public required string[] Exclude { get; set; }
+            public required string SortMethod { get; set; }
+            public required bool SortDescending { get; set; }
+
+            public SearchQuery ToSearchQuery()
+            {
+                var query = new SearchQuery
+                {
+                    Text = RawText,
+                    SortMethod = SortMethod switch
+                    {
+                        "release date" => Domain.SortMethod.ReleaseDate,
+                        "rating" => Domain.SortMethod.Rating,
+                        "relevance" => Domain.SortMethod.Relevance,
+                        "popularity" => Domain.SortMethod.Popularity,
+                        _ => throw new NotSupportedException(),
+                    },
+                    Adult = FilterState.None,
+                    SortDirection = SortDescending
+                        ? SortDirection.Descending
+                        : SortDirection.Ascending,
+                };
+
+                foreach (var include in Include)
+                {
+                    if (include == "adult")
+                        query.Adult = FilterState.Include;
+                }
+
+                foreach (var exclude in Exclude)
+                {
+                    if (exclude == "adult")
+                        query.Adult = FilterState.Exclude;
+                }
+
+                return query;
+            }
+        };
+
+        [HttpPost("query/{start}/{limit}")]
+        public async Task<IActionResult> QueryMovies(
+            SearchQueryInput queryInput,
+            int start,
+            int limit
+        )
+        {
+            SearchQuery query;
+
+            try
+            {
+                query = queryInput.ToSearchQuery();
+            }
+            catch (NotSupportedException)
+            {
+                return BadRequest();
+            }
+
+            return Ok(await _movieService.Query(query, start, limit));
         }
     }
 }

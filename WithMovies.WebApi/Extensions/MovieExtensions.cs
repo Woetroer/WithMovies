@@ -1,5 +1,6 @@
 ﻿using WithMovies.Domain.Models;
 using WithMovies.WebApi.Dtos;
+using WithMovies.Domain;
 
 namespace WithMovies.WebApi.Extensions
 {
@@ -30,7 +31,9 @@ namespace WithMovies.WebApi.Extensions
             dto.Genres = movie.Genres.Cast<int>().ToList();
             dto.HomePage = movie.HomePage;
             dto.PosterPath = movie.PosterPath;
-            dto.ProductionCompanies = movie.ProductionCompanies.Select(p => new NamedId { Id = p.Id, Name = p.Name }).ToList();
+            dto.ProductionCompanies = movie.ProductionCompanies
+                .Select(p => new NamedId { Id = p.Id, Name = p.Name })
+                .ToList();
             dto.ProductionCountries = movie.ProductionCountries;
             dto.ReleaseDate = movie.ReleaseDate;
             dto.Revenue = movie.Revenue;
@@ -45,13 +48,13 @@ namespace WithMovies.WebApi.Extensions
             return dto;
         }
 
-        public static PreviewDto ToPreviewDto(Movie movie) => new()
-        {
-            Id = movie.Id,
-            Title = movie.Title,
-            PosterPath = movie.PosterPath,
-            Tagline = movie.Tagline,
-        };
+        public static PreviewDto ToPreviewDto(Movie movie) =>
+            new()
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                PosterPath = movie.PosterPath,
+                Tagline = movie.Tagline,
+            };
     }
 }
-

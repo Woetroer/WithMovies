@@ -67,7 +67,7 @@ namespace WithMovies.Data.Sqlite
             await _dataContext.AddRangeAsync(keywords);
         }
 
-        public async Task<List<string>> FindKeywords(string text)
+        public async Task<IQueryable<Keyword>> FindKeywords(string text)
         {
             await _dataContext
                 .LoadExtension("fuzzy")
@@ -78,9 +78,7 @@ namespace WithMovies.Data.Sqlite
 
             _logger.LogDebug("Running script:\n" + script);
 
-            return await _dataContext.Database
-                .SqlQueryRaw<string>(script, new SqliteParameter("text", text))
-                .ToListAsync();
+            return _dataContext.Keywords.FromSqlRaw(script, new SqliteParameter("text", text));
         }
 
         public async Task<List<KeywordSuggestion>> FindKeywordSuggestions(string text)
@@ -109,7 +107,7 @@ namespace WithMovies.Data.Sqlite
         {
             StringBuilder builder = new();
 
-            builder.Append("SELECT Name ");
+            builder.Append("SELECT * ");
             builder.Append("FROM Keywords WHERE translit(Name) = translit(:text) ");
 
             builder.AppendJoin(

@@ -1,4 +1,4 @@
-﻿namespace WithMovies.WebApi.Dtos
+﻿namespace WithMovies.Domain
 {
     public class PreviewDto
     {

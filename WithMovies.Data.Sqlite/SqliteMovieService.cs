@@ -1,8 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WithMovies.Data.Sqlite;
+using WithMovies.Domain;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
@@ -47,18 +49,21 @@ namespace WithMovies.Business.Services
     public class SqliteMovieService : IMovieService
     {
         private readonly DataContext _dataContext;
+        private readonly IKeywordService _keywordService;
         private readonly ILogger<SqliteMovieService> _logger;
         private readonly IMovieCollectionService _movieCollectionService;
 
         public SqliteMovieService(
             DataContext dataContext,
             IMovieCollectionService movieCollectionService,
-            ILogger<SqliteMovieService> logger
+            ILogger<SqliteMovieService> logger,
+            IKeywordService keywordService
         )
         {
             _logger = logger;
             _dataContext = dataContext;
             _movieCollectionService = movieCollectionService;
+            _keywordService = keywordService;
         }
 
         public async Task ImportJsonAsync(Stream json)
@@ -218,6 +223,67 @@ namespace WithMovies.Business.Services
         public async Task<IQueryable<Movie>> GetWatchList(User user)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<SearchResults> Query(SearchQuery query, int start, int limit)
+        {
+            _logger.LogInformation("[query: {}] Dispatched", query.Text);
+
+            DateTime startTime = DateTime.Now;
+
+            var keywords = (await _keywordService.FindKeywords(query.Text))
+                .IgnoreAutoIncludes()
+                .Include(k => k.Movies);
+
+            _logger.LogInformation("[query: {}] Results received from database", query.Text);
+
+            var movies = keywords.SelectMany(k => k.Movies);
+
+            movies = query.SortMethod switch
+            {
+                SortMethod.Relevance
+                    => movies
+                        .GroupBy(m => m.Id)
+                        .OrderByDescending(g => g.Count())
+                        .Select(g => g.First()),
+                SortMethod.Popularity => movies.OrderByDescending(m => m.Popularity),
+                SortMethod.Rating
+                    => movies.OrderByDescending(m => Math.Pow(m.VoteCount, m.VoteAverage)),
+                SortMethod.ReleaseDate
+                    => movies.OrderByDescending(m => m.ReleaseDate ?? DateTime.MaxValue),
+                _ => throw new UnreachableException(),
+            };
+
+            if (query.SortDirection == SortDirection.Ascending)
+                movies = movies.Reverse();
+
+            movies = movies.Skip(start).Take(limit);
+
+            double time = (DateTime.Now - startTime).TotalSeconds;
+
+            _logger.LogInformation(
+                "[query: {}] Processed results, took {} seconds",
+                query.Text,
+                time
+            );
+
+            return new SearchResults
+            {
+                Time = time,
+                Keywords = keywords.Select(k => k.Name).ToArray(),
+                Movies = movies
+                    .Select(
+                        m =>
+                            new PreviewDto
+                            {
+                                Id = m.Id,
+                                Title = m.Title,
+                                PosterPath = m.PosterPath,
+                                Tagline = m.Tagline,
+                            }
+                    )
+                    .ToArray(),
+            };
         }
     }
 }

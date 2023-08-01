@@ -18,6 +18,7 @@ namespace WithMovies.Domain.Interfaces
         Task<List<User>> MostActiveUsers(int amount);
         Task<float> AverageReviewsPerUser();
 
-
+        Task ApplyRole(User user);
+        Task<Boolean> GetUserRole(User user);
     }
 }

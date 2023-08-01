@@ -53,7 +53,7 @@ namespace WithMovies.WebApi
                             options.Mask.Add(LogLevel.Debug);
 #endif
                         })
-            // .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None)
+                        .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None)
             );
 
             // Authentication

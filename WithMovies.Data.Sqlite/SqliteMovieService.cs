@@ -253,12 +253,16 @@ namespace WithMovies.Business.Services
                         m.Title.ToLower().Contains(query.Text.ToLower())
                         || m.Overview.ToLower().Contains(query.Text.ToLower())
                         || m.Tagline.ToLower().Contains(query.Text.ToLower())
+                        || (
+                            m.BelongsToCollection != null
+                            && m.BelongsToCollection.Name.ToLower().Contains(query.Text.ToLower())
+                        )
                 );
             }
 
             movies = query.SortMethod switch
             {
-                SortMethod.Relevance => movies,
+                SortMethod.Relevance => movies.OrderByDescending(m => m.Popularity),
                 SortMethod.Popularity => movies.OrderByDescending(m => m.Popularity),
                 SortMethod.Rating => movies.OrderByDescending(m => m.VoteCount * m.VoteAverage),
                 SortMethod.ReleaseDate

@@ -18,12 +18,6 @@ public class KeywordController : ControllerBase
         _keywordService = keywordService;
     }
 
-    [HttpGet("find/{query}")]
-    public async Task<IActionResult> FindKeywords(string query)
-    {
-        return Ok(await _keywordService.FindKeywords(query));
-    }
-
     [HttpGet("suggest/{query}")]
     public async Task<IActionResult> FindSuggestions(string query)
     {

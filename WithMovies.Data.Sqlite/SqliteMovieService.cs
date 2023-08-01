@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using WithMovies.Data.Sqlite;
 using WithMovies.Domain;
@@ -227,28 +228,39 @@ namespace WithMovies.Business.Services
 
         public async Task<SearchResults> Query(SearchQuery query, int start, int limit)
         {
-            _logger.LogInformation("[query: {}] Dispatched", query.Text);
-
             DateTime startTime = DateTime.Now;
 
-            var keywords = (await _keywordService.FindKeywords(query.Text))
-                .IgnoreAutoIncludes()
-                .Include(k => k.Movies);
+            var movies = _dataContext.LoadExtension("math").Movies.AsQueryable();
 
-            _logger.LogInformation("[query: {}] Results received from database", query.Text);
+            var excludeFilters = query.GetExcludeFilters();
+            if (excludeFilters.Length > 0)
+            {
+                var exclude = await _keywordService.FindKeywords(excludeFilters);
+                movies = movies.Where(m => !m.Keywords.Any(k => exclude.Contains(k)));
+            }
 
-            var movies = keywords.SelectMany(k => k.Movies);
+            var includeFilters = query.GetIncludeFilters();
+            if (includeFilters.Length > 0)
+            {
+                var include = await _keywordService.FindKeywords(includeFilters);
+                movies = movies.Where(m => m.Keywords.Any(k => include.Contains(k)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Text))
+            {
+                movies = movies.Where(
+                    m =>
+                        m.Title.ToLower().Contains(query.Text.ToLower())
+                        || m.Overview.ToLower().Contains(query.Text.ToLower())
+                        || m.Tagline.ToLower().Contains(query.Text.ToLower())
+                );
+            }
 
             movies = query.SortMethod switch
             {
-                SortMethod.Relevance
-                    => movies
-                        .GroupBy(m => m.Id)
-                        .OrderByDescending(g => g.Count())
-                        .Select(g => g.First()),
+                SortMethod.Relevance => movies,
                 SortMethod.Popularity => movies.OrderByDescending(m => m.Popularity),
-                SortMethod.Rating
-                    => movies.OrderByDescending(m => Math.Pow(m.VoteCount, m.VoteAverage)),
+                SortMethod.Rating => movies.OrderByDescending(m => m.VoteCount * m.VoteAverage),
                 SortMethod.ReleaseDate
                     => movies.OrderByDescending(m => m.ReleaseDate ?? DateTime.MaxValue),
                 _ => throw new UnreachableException(),
@@ -261,16 +273,9 @@ namespace WithMovies.Business.Services
 
             double time = (DateTime.Now - startTime).TotalSeconds;
 
-            _logger.LogInformation(
-                "[query: {}] Processed results, took {} seconds",
-                query.Text,
-                time
-            );
-
             return new SearchResults
             {
                 Time = time,
-                Keywords = keywords.Select(k => k.Name).ToArray(),
                 Movies = movies
                     .Select(
                         m =>

@@ -6,6 +6,5 @@ public class SearchResults
     /// Duration the query took to execute in seconds
     /// </summary>
     public required double Time { get; set; }
-    public required string[] Keywords { get; set; }
     public required PreviewDto[] Movies { get; set; }
 }

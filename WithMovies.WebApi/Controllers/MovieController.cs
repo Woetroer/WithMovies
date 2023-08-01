@@ -138,6 +138,7 @@ namespace WithMovies.WebApi.Controllers
                         _ => throw new NotSupportedException(),
                     },
                     Adult = FilterState.None,
+                    Filters = new(),
                     SortDirection = SortDescending
                         ? SortDirection.Descending
                         : SortDirection.Ascending,
@@ -147,12 +148,16 @@ namespace WithMovies.WebApi.Controllers
                 {
                     if (include == "adult")
                         query.Adult = FilterState.Include;
+                    else
+                        query.Filters[include] = FilterState.Include;
                 }
 
                 foreach (var exclude in Exclude)
                 {
                     if (exclude == "adult")
                         query.Adult = FilterState.Exclude;
+                    else
+                        query.Filters[exclude] = FilterState.Exclude;
                 }
 
                 return query;

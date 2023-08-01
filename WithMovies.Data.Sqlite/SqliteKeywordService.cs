@@ -67,18 +67,12 @@ namespace WithMovies.Data.Sqlite
             await _dataContext.AddRangeAsync(keywords);
         }
 
-        public async Task<IQueryable<Keyword>> FindKeywords(string text)
+        public Task<IQueryable<Keyword>> FindKeywords(string[] names)
         {
-            await _dataContext
-                .LoadExtension("fuzzy")
-                .LoadExtension("text")
-                .Database.BeginTransactionAsync();
+            if (names.Length == 0)
+                return Task.FromResult(Enumerable.Empty<Keyword>().AsQueryable());
 
-            var script = BuildFindKeywordsScript(text.Count(c => c == ' ') + 1);
-
-            _logger.LogDebug("Running script:\n" + script);
-
-            return _dataContext.Keywords.FromSqlRaw(script, new SqliteParameter("text", text));
+            return Task.FromResult(_dataContext.Keywords.Where(k => names.Contains(k.Name)));
         }
 
         public async Task<List<KeywordSuggestion>> FindKeywordSuggestions(string text)

@@ -213,14 +213,32 @@ namespace WithMovies.Business.Services
 
         public async Task<List<int>> GetTrendingGenres(int start, int limit)
         {
-            return await (await GetTrending(start, limit))
-                .SelectMany(m => m.Genres)
-                .Distinct()
-                .Cast<int>()
-                .ToListAsync();
+            List<int> genres = new();
+            List<Movie> movies = _dataContext
+                .LoadExtension("math")
+                .Movies.FromSqlRaw(
+                    """
+                    SELECT * FROM Movies
+                    ORDER BY pow(VoteCount, VoteAverage) DESC
+                    LIMIT :limit
+                    OFFSET :start
+                    """,
+                    new SqliteParameter(":start", start),
+                    new SqliteParameter(":limit", limit)
+                ).ToList();
+
+            foreach (Movie movie in movies)
+            {
+                foreach (Genre genre in movie.Genres)
+                {
+                    if (!genres.Contains((int)genre))
+                        genres.Add((int)genre);
+                }
+            }
+            return genres;
         }
 
-        public async Task<IQueryable<Movie>> GetFriendMovies(User user)
+            public async Task<IQueryable<Movie>> GetFriendMovies(User user)
         {
             throw new NotImplementedException();
         }

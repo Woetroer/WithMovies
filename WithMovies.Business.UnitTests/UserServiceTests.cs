@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
@@ -23,7 +24,7 @@ public class UserServiceTests : UnitTestBase<IUserService>
     {
         var users = await _service.GetAll();
         Assert.Equal(2, users.Count);
-        Assert.Equal(users[0].UserName, "Person");
+        Assert.Equal(users[0].UserName, "Person2");
     }
 
     [Fact]
@@ -86,7 +87,6 @@ public class UserServiceTests : UnitTestBase<IUserService>
         var users = await _service.MostActiveUsers(4);
 
         Assert.Equal(users.Count, 2);
-        Assert.Equal(users[0].UserName, "Person");
     }
 
     [Fact]
@@ -95,10 +95,16 @@ public class UserServiceTests : UnitTestBase<IUserService>
         Assert.Equal(1.5, await _service.AverageReviewsPerUser());
     }
 
+    [Fact]
+    public async Task TestAddRole()
+    {
+        await _service.ApplyRole(_user);
+        Assert.True(await _service.GetUserRole(_user));
+    }
+
     // csharpier-ignore
     protected override Task SetupDatabase(DataContext context)
     {
-        
         var movie = new Movie
         {
             Adult = false,

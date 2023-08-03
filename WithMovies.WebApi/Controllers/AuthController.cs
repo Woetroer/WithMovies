@@ -198,6 +198,26 @@ namespace WithMovies.WebApi.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        [Route("apply/admin/{user}")]
+        public async Task<IActionResult> ApplyAdmin(string user)
+        {
+            var account = await _userManager.FindByNameAsync(user);
+            if (account == null)
+                return Unauthorized();
+
+            if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
+                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+
+            if (await _roleManager.RoleExistsAsync(UserRoles.Admin))
+                await _userManager.AddToRoleAsync(account, UserRoles.Admin);
+
+            await _dataContext.SaveChangesAsync();
+
+            return Ok();
+
+        }
+
         private async Task<string> GenerateAccessToken(User user)
         {
             var userRoles = await _userManager.GetRolesAsync(user);

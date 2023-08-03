@@ -14,7 +14,7 @@ namespace WithMovies.Domain.Interfaces
         Task ReviewRights(User user);
         Task SetPreferencesAsync(bool[] preferences, User user);
         Task<User?> GetByName(string name);
-        Task<List<User>> GetAll();
+        Task<int> GetAllCount();
         Task<List<User>> MostActiveUsers(int amount);
         Task<float> AverageReviewsPerUser();
 

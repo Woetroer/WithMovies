@@ -6,10 +6,10 @@ namespace WithMovies.WebApi.Extensions
 {
     public static class UserExtensions
     {
-        public static UserDto ToDto(this User user, string UserName)
+        public static UserDto ToDto(this User user)
         {
             UserDto dto = new UserDto();
-            dto.UserName = UserName;
+            dto.UserName = user.UserName;
             dto.IsBlocked = user.IsBlocked;
             dto.LastOnline = user.LastLogin.ToLongDateString();
             dto.Reviews = user.Reviews.Count();

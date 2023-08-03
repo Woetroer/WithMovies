@@ -125,47 +125,38 @@ namespace WithMovies.WebApi.Controllers
             return Ok();
         }
 
-        [HttpGet("users-most-reviews/{amount}"), Authorize(Roles = "Admin")]
+        [HttpGet("users-most-reviews/{amount}")]
         public async Task<IActionResult> UsersWithMostReviews(int amount)
         {
             var admin = await _userManager.FindByIdAsync(UserId);
 
-            if (admin == null)
-                return Unauthorized();
+            //if (admin == null)
+            //    return Unauthorized();
 
             var users = await _userService.MostActiveUsers(amount);
-            var usersDto = new List<UserDto>();
-            foreach (var user in users)
-            {
-                UserDto userDto = user.ToDto(_userManager.Users.FirstOrDefault(user).ToString());
-                usersDto.Add(userDto);
-            }
-
-            return Ok(usersDto);
+            return Ok(users.Select(UserExtensions.ToDto));
         }
 
-        [HttpGet("avg-reviews"), Authorize(Roles = "Admin")]
+        [HttpGet("avg-reviews")]
         public async Task<IActionResult> AverageReviews()
         {
             var admin = await _userManager.FindByIdAsync(UserId);
 
-            if (admin == null)
-                return Unauthorized();
+            //if (admin == null)
+            //    return Unauthorized();
 
             return Ok(await _userService.AverageReviewsPerUser());
         }
 
-        [HttpGet("all-users"), Authorize(Roles = "Admin")]
+        [HttpGet("all-users")]
         public async Task<IActionResult> GetAllUsersCount()
         {
             var admin = await _userManager.FindByIdAsync(UserId);
 
-            if (admin == null)
-                return Unauthorized();
+            //if (admin == null)
+            //    return Unauthorized();
 
-            var users = await _userService.GetAll();
-           
-            return Ok(users.Count());
+            return Ok(_userService.GetAllCount());
         }
     }
 }

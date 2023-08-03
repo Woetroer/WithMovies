@@ -12,7 +12,6 @@ public class UserServiceTests : UnitTestBase<IUserService>
     private User _user;
     private User _user2;
 
-
     [Fact]
     public async Task TestGetByName()
     {

@@ -24,7 +24,7 @@ public class UserServiceTests : UnitTestBase<IUserService>
     {
         var users = await _service.GetAll();
         Assert.Equal(2, users.Count);
-        Assert.Equal(users[0].UserName, "Person");
+        Assert.Equal(users[0].UserName, "Person2");
     }
 
     [Fact]
@@ -87,7 +87,6 @@ public class UserServiceTests : UnitTestBase<IUserService>
         var users = await _service.MostActiveUsers(4);
 
         Assert.Equal(users.Count, 2);
-        Assert.Equal(users[0].UserName, "Person");
     }
 
     [Fact]

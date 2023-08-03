@@ -37,9 +37,9 @@ namespace WithMovies.Business.UnitTests
         {
             var genres = await _service.GetTrendingGenres(0, 6);
 
-            Assert.Equal(18, genres[0]);
-            Assert.Equal(6, genres.Count);
-            Assert.Equal(10, genres[5]);
+            Assert.Equal(1, genres[0]);
+            Assert.Equal(10, genres.Count);
+            Assert.Equal(0, genres[5]);
         }
 
         protected override Task SetupDatabase(DataContext context)
@@ -67,7 +67,7 @@ namespace WithMovies.Business.UnitTests
                 Runtime = new TimeSpan(),
                 SpokenLanguages = new List<string?>() { "en" },
                 Status = MovieStatus.Released,
-                VoteAverage = 3.10,
+                VoteAverage = 4.90,
                 VoteCount = 200,
                 Popularity = 4.23,
                 Cast = new List<CastMember>() { },
@@ -132,7 +132,7 @@ namespace WithMovies.Business.UnitTests
                     Runtime = new TimeSpan(),
                     SpokenLanguages = new List<string?>() { "en" },
                     Status = MovieStatus.Released,
-                    VoteAverage = 2.10,
+                    VoteAverage = 3.90,
                     VoteCount = 200,
                     Popularity = 4.23,
                     Cast = new List<CastMember>() { },
@@ -165,7 +165,7 @@ namespace WithMovies.Business.UnitTests
                     Runtime = new TimeSpan(),
                     SpokenLanguages = new List<string?>() { "en" },
                     Status = MovieStatus.Released,
-                    VoteAverage = 1.10,
+                    VoteAverage = 3.10,
                     VoteCount = 200,
                     Popularity = 4.23,
                     Cast = new List<CastMember>() { },
@@ -198,7 +198,7 @@ namespace WithMovies.Business.UnitTests
                     Runtime = new TimeSpan(),
                     SpokenLanguages = new List<string?>() { "en" },
                     Status = MovieStatus.Released,
-                    VoteAverage = 3.10,
+                    VoteAverage = 2.10,
                     VoteCount = 200,
                     Popularity = 4.23,
                     Cast = new List<CastMember>() { },
@@ -233,7 +233,7 @@ namespace WithMovies.Business.UnitTests
                     Status = MovieStatus.Released,
                     VoteAverage = 3.10,
                     VoteCount = 200,
-                    Popularity = 4.23,
+                    Popularity = 1.23,
                     Cast = new List<CastMember>() { },
                     Crew = new List<CrewMember>() { },
                     Reviews = new List<Review>() { },

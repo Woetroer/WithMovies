@@ -7,17 +7,23 @@ using System.Threading.Tasks;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using Microsoft.Data.Sqlite;
+using Microsoft.AspNetCore.Identity;
+
 
 
 namespace WithMovies.Business.Services
 {
     public class UserService : IUserService
     {
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private DataContext _dataContext;
 
-        public UserService(DataContext dataContext)
+        public UserService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, DataContext dataContext)
         {
+            _userManager = userManager;
             _dataContext = dataContext;
+            _roleManager = roleManager;
         }
 
         public async Task Block(User user)
@@ -70,6 +76,21 @@ namespace WithMovies.Business.Services
 
             float average = reviews / users;
             return average;
+        }
+
+        public async Task ApplyRole(User user)
+        {
+            if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
+                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+
+            if (await _roleManager.RoleExistsAsync(UserRoles.Admin))
+                await _userManager.AddToRoleAsync(user, UserRoles.Admin);
+        }
+
+        public async Task<Boolean> GetUserRole(User user)
+        {
+            var admin = await _userManager.GetRolesAsync(user);
+            return admin.Any(s => s == "Admin");
         }
     }
 }

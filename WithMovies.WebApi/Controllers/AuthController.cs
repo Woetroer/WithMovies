@@ -212,6 +212,8 @@ namespace WithMovies.WebApi.Controllers
             if (await _roleManager.RoleExistsAsync(UserRoles.Admin))
                 await _userManager.AddToRoleAsync(account, UserRoles.Admin);
 
+            await _dataContext.SaveChangesAsync();
+
             return Ok();
 
         }

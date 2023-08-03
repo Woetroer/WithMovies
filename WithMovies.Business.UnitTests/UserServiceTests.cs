@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
@@ -21,7 +22,8 @@ public class UserServiceTests : UnitTestBase<IUserService>
     [Fact]
     public async Task TestGetAll()
     {
-        Assert.Equal(2, _service.GetAll().Result.Count);
+        var users = await _service.GetAll();
+        Assert.Equal(2, users.Count);
     }
 
     [Fact]
@@ -75,7 +77,28 @@ public class UserServiceTests : UnitTestBase<IUserService>
     {
         var name = _user.UserName;
         await _service.Delete(_user);
-        Assert.Null(_service.GetByName(name).Result);
+        Assert.Null(await _service.GetByName(name));
+    }
+
+    [Fact]
+    public async Task TestOrderByReviews()
+    {
+        var users = await _service.MostActiveUsers(4);
+
+        Assert.Equal(users.Count, 2);
+    }
+
+    [Fact]
+    public async Task TestAverageReviews()
+    {
+        Assert.Equal(1.5, await _service.AverageReviewsPerUser());
+    }
+
+    [Fact]
+    public async Task TestAddRole()
+    {
+        await _service.ApplyRole(_user);
+        Assert.True(await _service.GetUserRole(_user));
     }
 
     // csharpier-ignore

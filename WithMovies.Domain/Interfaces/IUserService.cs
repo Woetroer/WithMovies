@@ -15,6 +15,10 @@ namespace WithMovies.Domain.Interfaces
         Task SetPreferencesAsync(bool[] preferences, User user);
         Task<User?> GetByName(string name);
         Task<List<User>> GetAll();
+        Task<List<User>> MostActiveUsers(int amount);
+        Task<float> AverageReviewsPerUser();
 
+        Task ApplyRole(User user);
+        Task<Boolean> GetUserRole(User user);
     }
 }

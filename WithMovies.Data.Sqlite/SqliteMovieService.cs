@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using WithMovies.Data.Sqlite;
 using WithMovies.Domain;
@@ -214,6 +214,33 @@ namespace WithMovies.Business.Services
                     new SqliteParameter(":start", start),
                     new SqliteParameter(":limit", limit)
                 );
+        }
+
+        public async Task<List<int>> GetTrendingGenres(int start, int limit)
+        {
+            List<int> genres = new();
+            List<Movie> movies = _dataContext
+                .LoadExtension("math")
+                .Movies.FromSqlRaw(
+                    """
+                    SELECT * FROM Movies
+                    ORDER BY pow(VoteCount, VoteAverage) DESC
+                    LIMIT :limit
+                    OFFSET :start
+                    """,
+                    new SqliteParameter(":start", start),
+                    new SqliteParameter(":limit", limit)
+                )
+                .ToList();
+
+            foreach (Movie movie in movies)
+            {
+                foreach (Genre genre in movie.Genres)
+                {
+                    genres.Add((int)genre);
+                }
+            }
+            return genres;
         }
 
         public async Task<IQueryable<Movie>> GetFriendMovies(User user)

@@ -9,6 +9,7 @@ using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Dtos;
 using WithMovies.WebApi.Extensions;
+using static WithMovies.WebApi.Controllers.UserController;
 
 namespace WithMovies.WebApi.Controllers
 {
@@ -56,6 +57,17 @@ namespace WithMovies.WebApi.Controllers
                     MovieExtensions.ToPreviewDto
                 )
             );
+        }
+
+        [HttpGet("trending/genres/{start}/{limit}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> TrendingGenres(int start, int limit)
+        {
+            var user = await _userManager.FindByIdAsync(UserId);
+
+            if (user == null)
+                return Unauthorized();
+
+            return Ok(await _movieService.GetTrendingGenres(start, limit));
         }
 
         [HttpGet("linked/friends/{start}/{limit}"), Authorize]

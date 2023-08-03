@@ -16,11 +16,30 @@ namespace WithMovies.Business.UnitTests
         [InlineData(3, "Fourth time's the charm...")]
         [InlineData(2, "The Third!")]
         [InlineData(5, "5 pees in a pod")]
-        public async Task GetById(int id, string expected)
+        public async Task TestGetById(int id, string expected)
         {
             var movie = await _service.GetByIdAsync(id);
 
             Assert.Equal(movie?.Title, expected);
+        }
+
+        [Fact]
+        public async Task TestGetTrending()
+        {
+            var movies = (await _service.GetTrending(0, 6)).ToList();
+
+            Assert.Equal("First Flight", movies[0].Title);
+            Assert.Equal("5 pees in a pod", movies[5].Title);
+        }
+
+        [Fact]
+        public async Task TestGetTrendingGenres()
+        {
+            var genres = await _service.GetTrendingGenres(0, 6);
+
+            Assert.Equal(1, genres[0]);
+            Assert.Equal(10, genres.Count);
+            Assert.Equal(0, genres[5]);
         }
 
         protected override Task SetupDatabase(DataContext context)
@@ -48,7 +67,7 @@ namespace WithMovies.Business.UnitTests
                 Runtime = new TimeSpan(),
                 SpokenLanguages = new List<string?>() { "en" },
                 Status = MovieStatus.Released,
-                VoteAverage = 3.10,
+                VoteAverage = 4.90,
                 VoteCount = 200,
                 Popularity = 4.23,
                 Cast = new List<CastMember>() { },
@@ -80,7 +99,7 @@ namespace WithMovies.Business.UnitTests
                     Runtime = new TimeSpan(),
                     SpokenLanguages = new List<string?>() { "en" },
                     Status = MovieStatus.Released,
-                    VoteAverage = 3.10,
+                    VoteAverage = 4.10,
                     VoteCount = 200,
                     Popularity = 4.23,
                     Cast = new List<CastMember>() { },
@@ -113,7 +132,7 @@ namespace WithMovies.Business.UnitTests
                     Runtime = new TimeSpan(),
                     SpokenLanguages = new List<string?>() { "en" },
                     Status = MovieStatus.Released,
-                    VoteAverage = 3.10,
+                    VoteAverage = 3.90,
                     VoteCount = 200,
                     Popularity = 4.23,
                     Cast = new List<CastMember>() { },
@@ -179,7 +198,7 @@ namespace WithMovies.Business.UnitTests
                     Runtime = new TimeSpan(),
                     SpokenLanguages = new List<string?>() { "en" },
                     Status = MovieStatus.Released,
-                    VoteAverage = 3.10,
+                    VoteAverage = 2.10,
                     VoteCount = 200,
                     Popularity = 4.23,
                     Cast = new List<CastMember>() { },
@@ -213,8 +232,8 @@ namespace WithMovies.Business.UnitTests
                     SpokenLanguages = new List<string?>() { "en" },
                     Status = MovieStatus.Released,
                     VoteAverage = 3.10,
-                    VoteCount = 201,
-                    Popularity = 4.23,
+                    VoteCount = 200,
+                    Popularity = 1.23,
                     Cast = new List<CastMember>() { },
                     Crew = new List<CrewMember>() { },
                     Reviews = new List<Review>() { },

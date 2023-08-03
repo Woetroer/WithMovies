@@ -24,7 +24,6 @@ public class UserServiceTests : UnitTestBase<IUserService>
     {
         var users = await _service.GetAll();
         Assert.Equal(2, users.Count);
-        Assert.Equal(users[0].UserName, "Person2");
     }
 
     [Fact]

@@ -28,8 +28,8 @@ namespace WithMovies.Business.UnitTests
         {
             var movies = (await _service.GetTrending(0, 6)).ToList();
 
-            Assert.Equal("Electric Boogalu!", movies[0].Title);
-            Assert.Equal("Fourth time's the charm...", movies[5].Title);
+            Assert.Equal("First Flight", movies[0].Title);
+            Assert.Equal("5 pees in a pod", movies[5].Title);
         }
 
         [Fact]

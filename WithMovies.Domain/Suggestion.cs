@@ -2,11 +2,8 @@ using WithMovies.Domain.Models;
 
 namespace WithMovies.Domain;
 
-public class KeywordSuggestion
+public class Suggestion
 {
-    private object value;
-    private string text;
-
     /// <summary>
     /// What the user actually typed
     /// </summary>
@@ -33,7 +30,7 @@ public class KeywordSuggestion
 
     public float Weight { get; set; }
 
-    public KeywordSuggestion(string suggestion, string userInput, float weight)
+    public Suggestion(string suggestion, string userInput, float weight)
     {
         RawText = userInput;
         Keyword = suggestion;

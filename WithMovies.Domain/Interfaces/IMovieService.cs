@@ -10,6 +10,7 @@ namespace WithMovies.Domain.Interfaces
         Task<IQueryable<Movie>> GetFriendMovies(User user);
         Task<IQueryable<Movie>> GetWatchList(User user);
         Task<Movie?> GetByIdAsync(int id);
+        Task<SearchResults> Query(SearchQuery query, int start, int limit);
         Task<List<int>> GetTrendingGenres(int start, int limit);
     }
 }

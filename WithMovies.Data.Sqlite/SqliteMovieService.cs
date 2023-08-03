@@ -1,9 +1,10 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WithMovies.Data.Sqlite;
+using WithMovies.Domain;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
@@ -48,18 +49,21 @@ namespace WithMovies.Business.Services
     public class SqliteMovieService : IMovieService
     {
         private readonly DataContext _dataContext;
+        private readonly IKeywordService _keywordService;
         private readonly ILogger<SqliteMovieService> _logger;
         private readonly IMovieCollectionService _movieCollectionService;
 
         public SqliteMovieService(
             DataContext dataContext,
             IMovieCollectionService movieCollectionService,
-            ILogger<SqliteMovieService> logger
+            ILogger<SqliteMovieService> logger,
+            IKeywordService keywordService
         )
         {
             _logger = logger;
             _dataContext = dataContext;
             _movieCollectionService = movieCollectionService;
+            _keywordService = keywordService;
         }
 
         public async Task ImportJsonAsync(Stream json)
@@ -116,7 +120,7 @@ namespace WithMovies.Business.Services
 
                 if (iteration % 500 == 0)
                 {
-                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">",-11}|";
+                    string progressBar = $"|{new string('=', (int)(progress * 10.0)) + ">", -11}|";
                     _logger.LogInformation($"{progressBar} Adding movies");
                 }
 
@@ -225,13 +229,14 @@ namespace WithMovies.Business.Services
                     """,
                     new SqliteParameter(":start", start),
                     new SqliteParameter(":limit", limit)
-                ).ToList();
+                )
+                .ToList();
 
             foreach (Movie movie in movies)
             {
                 foreach (Genre genre in movie.Genres)
                 {
-                        genres.Add((int)genre);
+                    genres.Add((int)genre);
                 }
             }
             return genres;
@@ -246,5 +251,122 @@ namespace WithMovies.Business.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<SearchResults> Query(SearchQuery query, int start, int limit)
+        {
+            DateTime startTime = DateTime.Now;
+
+            var movies = _dataContext.Movies.AsQueryable();
+
+            if (query.Collection != null)
+            {
+                movies = movies.Where(
+                    m =>
+                        m.BelongsToCollection != null
+                        && m.BelongsToCollection.Name == query.Collection
+                );
+            }
+
+            var excludeCompanyFilters = query.GetExcludeProductionCompanyFilters();
+            if (excludeCompanyFilters.Length > 0)
+            {
+                movies = movies.Where(
+                    m => !m.ProductionCompanies.Any(k => excludeCompanyFilters.Contains(k.Name))
+                );
+            }
+
+            var includeCompanyFilters = query.GetIncludeProductionCompanyFilters().ToList();
+            if (includeCompanyFilters.Count > 0)
+            {
+                var filterCount = includeCompanyFilters.Count;
+                movies = movies.Where(
+                    m =>
+                        m.ProductionCompanies
+                            .Where(c => includeCompanyFilters.Contains(c.Name))
+                            .Count() == filterCount
+                );
+            }
+
+            var excludeFilters = query.GetExcludeFilters();
+            if (excludeFilters.Length > 0)
+            {
+                var exclude = await _keywordService.FindKeywords(excludeFilters);
+                movies = movies.Where(m => !m.Keywords.Any(k => exclude.Contains(k)));
+            }
+
+            var includeFilters = query.GetIncludeFilters();
+            if (includeFilters.Length > 0)
+            {
+                var include = await _keywordService.FindKeywords(includeFilters);
+                var filterCount = include.Count();
+                movies = movies.Where(
+                    m => m.Keywords.Where(k => include.Contains(k)).Count() == filterCount
+                );
+            }
+
+            // var excludeGenreFilters = query.GetExcludeGenreFilters().ToList();
+            // foreach (var genre in excludeGenreFilters!)
+            // {
+            //     movies = movies.Where(m => !m.Genres.Any(g => GenreEqual(g, genre)));
+            // }
+
+            // var includeGenreFilters = query.GetIncludeGenreFilters().ToList();
+            // foreach (var genre in includeGenreFilters!)
+            // {
+            //     movies = movies.Where(m => m.Genres.Any(g => GenreEqual(g, genre)));
+            // }
+
+            if (!string.IsNullOrWhiteSpace(query.Text))
+            {
+                movies = movies.Where(
+                    m =>
+                        m.Title.ToLower().Contains(query.Text.ToLower())
+                        || m.Overview.ToLower().Contains(query.Text.ToLower())
+                        || m.Tagline.ToLower().Contains(query.Text.ToLower())
+                        || (
+                            m.BelongsToCollection != null
+                            && m.BelongsToCollection.Name.ToLower().Contains(query.Text.ToLower())
+                        )
+                );
+            }
+
+            movies = query.SortMethod switch
+            {
+                SortMethod.Relevance => movies.OrderByDescending(m => m.Popularity),
+                SortMethod.Popularity => movies.OrderByDescending(m => m.Popularity),
+                SortMethod.Rating => movies.OrderByDescending(m => m.VoteCount * m.VoteAverage),
+                SortMethod.ReleaseDate
+                    => movies.OrderByDescending(m => m.ReleaseDate ?? DateTime.MaxValue),
+                _ => throw new UnreachableException(),
+            };
+
+            if (query.SortDirection == SortDirection.Ascending)
+                movies = movies.Reverse();
+
+            movies = movies.Skip(start).Take(limit);
+
+            double time = (DateTime.Now - startTime).TotalSeconds;
+
+            return new SearchResults
+            {
+                Time = time,
+                Movies = movies
+                    .Select(
+                        m =>
+                            new PreviewDto
+                            {
+                                Id = m.Id,
+                                Title = m.Title,
+                                PosterPath = m.PosterPath,
+                                Tagline = m.Tagline,
+                            }
+                    )
+                    .ToArray(),
+            };
+        }
+
+        // Database function, defined in SQL. Keep it here as it is used to
+        // inform Entity Framework Core about the signature of the function.
+        private static bool GenreEqual(Genre a, Genre b) => throw new NotImplementedException();
     }
 }

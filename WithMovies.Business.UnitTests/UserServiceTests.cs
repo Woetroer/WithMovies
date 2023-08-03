@@ -22,9 +22,8 @@ public class UserServiceTests : UnitTestBase<IUserService>
     [Fact]
     public async Task TestGetAllCount()
     {
-        var users = await _service.GetAll();
-        Assert.Equal(2, users.Count);
-        Assert.Equal(users[0].UserName, "Person2");
+        var users = await _service.GetAllCount();
+        Assert.Equal(2, users);
     }
 
     [Fact]

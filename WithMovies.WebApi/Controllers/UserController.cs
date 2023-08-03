@@ -125,37 +125,22 @@ namespace WithMovies.WebApi.Controllers
             return Ok();
         }
 
-        [HttpGet("users-most-reviews/{amount}")]
+        [HttpGet("users-most-reviews/{amount}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UsersWithMostReviews(int amount)
         {
-            var admin = await _userManager.FindByIdAsync(UserId);
-
-            //if (admin == null)
-            //    return Unauthorized();
-
             var users = await _userService.MostActiveUsers(amount);
             return Ok(users.Select(UserExtensions.ToDto));
         }
 
-        [HttpGet("avg-reviews")]
+        [HttpGet("avg-reviews"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> AverageReviews()
         {
-            var admin = await _userManager.FindByIdAsync(UserId);
-
-            //if (admin == null)
-            //    return Unauthorized();
-
             return Ok(await _userService.AverageReviewsPerUser());
         }
 
-        [HttpGet("all-users")]
+        [HttpGet("all-users"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsersCount()
         {
-            var admin = await _userManager.FindByIdAsync(UserId);
-
-            //if (admin == null)
-            //    return Unauthorized();
-
             return Ok(_userService.GetAllCount());
         }
     }

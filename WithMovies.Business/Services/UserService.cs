@@ -57,15 +57,15 @@ namespace WithMovies.Business.Services
             return user;
         }
 
-        public async Task<List<User>> GetAll()
+        public async Task<int> GetAllCount()
         {
-            var users = await _dataContext.Users.ToListAsync();
+            var users = await _dataContext.Users.CountAsync();
             return users;
         }
 
         public async Task<List<User>> MostActiveUsers(int amount)
         {
-            var users = await _dataContext.Users.OrderByDescending(n => n.Reviews.Count).Take(amount).ToListAsync();
+            var users = await _dataContext.Users.OrderByDescending(n => n.Reviews.Count()).Take(amount).ToListAsync();
             return users;
         }
 

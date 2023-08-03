@@ -12,7 +12,6 @@ public class UserServiceTests : UnitTestBase<IUserService>
     private User _user;
     private User _user2;
 
-
     [Fact]
     public async Task TestGetByName()
     {
@@ -20,10 +19,10 @@ public class UserServiceTests : UnitTestBase<IUserService>
     }
 
     [Fact]
-    public async Task TestGetAll()
+    public async Task TestGetAllCount()
     {
-        var users = await _service.GetAll();
-        Assert.Equal(2, users.Count);
+        var users = await _service.GetAllCount();
+        Assert.Equal(2, users);
     }
 
     [Fact]

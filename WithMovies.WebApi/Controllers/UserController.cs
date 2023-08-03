@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using WithMovies.Business;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
+using WithMovies.WebApi.Dtos;
+using WithMovies.WebApi.Extensions;
 
 namespace WithMovies.WebApi.Controllers
 {
@@ -126,23 +128,20 @@ namespace WithMovies.WebApi.Controllers
         [HttpGet("users-most-reviews/{amount}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UsersWithMostReviews(int amount)
         {
-            var user = await _userManager.FindByIdAsync(UserId);
-
-            if (user == null)
-                return Unauthorized();
-
-            return Ok(await _userService.MostActiveUsers(amount));
+            var users = await _userService.MostActiveUsers(amount);
+            return Ok(users.Select(UserExtensions.ToDto));
         }
 
         [HttpGet("avg-reviews"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> AverageReviews()
         {
-            var user = await _userManager.FindByIdAsync(UserId);
-
-            if (user == null)
-                return Unauthorized();
-
             return Ok(await _userService.AverageReviewsPerUser());
+        }
+
+        [HttpGet("all-users"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllUsersCount()
+        {
+            return Ok(_userService.GetAllCount());
         }
     }
 }

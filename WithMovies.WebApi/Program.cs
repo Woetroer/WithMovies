@@ -37,12 +37,14 @@ namespace WithMovies.WebApi
             builder.Services.AddScoped<IProductionCompanyService, ProductionCompanyService>();
             builder.Services.AddScoped<IMovieCollectionService, MovieCollectionService>();
             builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+            builder.Services.AddScoped<ISuggestionService, SqliteSuggestionService>();
             builder.Services.AddScoped<IKeywordService, SqliteKeywordService>();
-            builder.Services.AddScoped<ICreditsService, CreditsService>();
             builder.Services.AddScoped<IMovieService, SqliteMovieService>();
-            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICreditsService, CreditsService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddHostedService<AlgorithmScheduler>();
+
             builder.Services.AddLogging(
                 x =>
                     x.ClearProviders()

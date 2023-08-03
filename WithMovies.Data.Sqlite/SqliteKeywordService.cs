@@ -17,13 +17,6 @@ namespace WithMovies.Data.Sqlite
         private DataContext _dataContext;
         private ILogger<SqliteKeywordService> _logger;
 
-        private static string BasePath = Path.GetDirectoryName(
-            Assembly.GetExecutingAssembly().Location
-        )!;
-        private static string SuggestKeywordsScript = File.ReadAllText(
-            Path.Combine(BasePath, "sql/suggest-keywords.sql")
-        );
-
         public SqliteKeywordService(DataContext dataContext, ILogger<SqliteKeywordService> logger)
         {
             _dataContext = dataContext;
@@ -73,89 +66,6 @@ namespace WithMovies.Data.Sqlite
                 return Task.FromResult(Enumerable.Empty<Keyword>().AsQueryable());
 
             return Task.FromResult(_dataContext.Keywords.Where(k => names.Contains(k.Name)));
-        }
-
-        public async Task<List<KeywordSuggestion>> FindKeywordSuggestions(string text)
-        {
-            await _dataContext
-                .LoadExtension("fuzzy")
-                .LoadExtension("text")
-                .Database.BeginTransactionAsync();
-
-            var script = BuildSuggestKeywordsScript(text.Count(c => c == ' ') + 1, 0.85f);
-
-            _logger.LogInformation("Running script:\n" + script);
-
-            var keywords = await _dataContext
-                .Set<KeywordRecord>()
-                .FromSqlRaw(script, new SqliteParameter("text", text))
-                .ToListAsync();
-
-            return keywords
-                .Select(k => new KeywordSuggestion(k.Name!, text, (float)k.Weight!))
-                .ToList();
-        }
-
-        // Generates an SQL script that searches all possible keyword combinations
-        private static string BuildFindKeywordsScript(int words)
-        {
-            StringBuilder builder = new();
-
-            builder.Append("SELECT * ");
-            builder.Append("FROM Keywords WHERE translit(Name) = translit(:text) ");
-
-            builder.AppendJoin(
-                ' ',
-                Enumerable
-                    .Range(1, words)
-                    .Select(i =>
-                    {
-                        StringBuilder subBuilder = new();
-
-                        for (int j = 1; j < Math.Min(9, words - i + 1); j++)
-                        {
-                            subBuilder.Append("OR CONCAT(' ', text_join(' ', ");
-                            subBuilder.AppendJoin(
-                                ", ",
-                                Enumerable
-                                    .Range(1, Math.Min(j, words - i))
-                                    .Select(k => $"text_split(translit(:text), ' ', {i + k})")
-                            );
-                            subBuilder.Append("), ' ') LIKE CONCAT('% ', translit(Name), ' %') ");
-                        }
-
-                        return subBuilder.ToString();
-                    })
-            );
-
-            return builder.ToString();
-        }
-
-        private static string BuildSuggestKeywordsScript(int words, float weightThreshold)
-        {
-            StringBuilder builder = new();
-
-            builder.Append("SELECT Name, max(");
-
-            for (int i = 0; i < Math.Min(8, words); i++)
-            {
-                builder.Append("jaro_winkler(translit(Name), text_join(' '");
-
-                for (int j = i; j >= 0; j--)
-                {
-                    builder.Append($", text_split(translit(:text), ' ', {words - j})");
-                }
-
-                builder.Append(")), ");
-            }
-
-            builder.Append($"-1) AS Weight FROM Keywords ");
-            builder.Append(
-                $"WHERE Weight > {weightThreshold.ToString(CultureInfo.InvariantCulture)} "
-            );
-            builder.Append("ORDER BY Weight DESC LIMIT 25;");
-
-            return builder.ToString();
         }
     }
 }

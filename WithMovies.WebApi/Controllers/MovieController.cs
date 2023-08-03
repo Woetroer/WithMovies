@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WithMovies.Business;
 using WithMovies.Domain;
+using WithMovies.Domain.Enums;
 using WithMovies.Domain.Interfaces;
 using WithMovies.Domain.Models;
 using WithMovies.WebApi.Dtos;
@@ -18,19 +19,22 @@ namespace WithMovies.WebApi.Controllers
         private readonly IMovieService _movieService;
         private readonly UserManager<User> _userManager;
         private readonly IRecommendationService _recommendationService;
+        private readonly IMovieCollectionService _movieCollectionService;
         private readonly DataContext _dataContext;
 
         public MovieController(
             IMovieService movieService,
             UserManager<User> userManager,
             IRecommendationService recommendationService,
-            DataContext dataContext
+            DataContext dataContext,
+            IMovieCollectionService movieCollectionService
         )
         {
             _movieService = movieService;
             _userManager = userManager;
             _recommendationService = recommendationService;
             _dataContext = dataContext;
+            _movieCollectionService = movieCollectionService;
         }
 
         [HttpGet("trending/{start}/{limit}")]
@@ -116,11 +120,36 @@ namespace WithMovies.WebApi.Controllers
             return Ok(movie.ToDto());
         }
 
+        [HttpGet("collection/name/{name}")]
+        public async Task<IActionResult> GetCollectionByNameAsync(string name)
+        {
+            var collection = await _movieCollectionService.MovieCollectionGetByNameAsync(name);
+
+            if (collection == null)
+                return NotFound();
+
+            return Ok(
+                new MovieCollectionDto
+                {
+                    Id = collection.Id,
+                    BackdropPath = collection.BackdropPath,
+                    PosterPath = collection.PosterPath,
+                    Name = collection.Name,
+                    ItemCount = collection.Movies.Count(),
+                }
+            );
+        }
+
         public class SearchQueryInput
         {
-            public required string RawText { get; set; }
+            public string? RawText { get; set; }
             public required string[] Include { get; set; }
             public required string[] Exclude { get; set; }
+            public required string[] IncludeGenres { get; set; }
+            public required string[] ExcludeGenres { get; set; }
+            public required string[] IncludeProductionCompanies { get; set; }
+            public required string[] ExcludeProductionCompanies { get; set; }
+            public string? Collection { get; set; }
             public required string SortMethod { get; set; }
             public required bool SortDescending { get; set; }
 
@@ -128,7 +157,7 @@ namespace WithMovies.WebApi.Controllers
             {
                 var query = new SearchQuery
                 {
-                    Text = RawText,
+                    Text = RawText ?? "",
                     SortMethod = SortMethod switch
                     {
                         "release date" => Domain.SortMethod.ReleaseDate,
@@ -139,9 +168,12 @@ namespace WithMovies.WebApi.Controllers
                     },
                     Adult = FilterState.None,
                     Filters = new(),
+                    GenreFilters = new(),
                     SortDirection = SortDescending
                         ? SortDirection.Descending
                         : SortDirection.Ascending,
+                    Collection = Collection,
+                    ProductionCompanyFilters = new(),
                 };
 
                 foreach (var include in Include)
@@ -158,6 +190,26 @@ namespace WithMovies.WebApi.Controllers
                         query.Adult = FilterState.Exclude;
                     else
                         query.Filters[exclude] = FilterState.Exclude;
+                }
+
+                foreach (var include in IncludeGenres)
+                {
+                    query.GenreFilters[Enum.Parse<Genre>(include)] = FilterState.Include;
+                }
+
+                foreach (var exclude in ExcludeGenres)
+                {
+                    query.GenreFilters[Enum.Parse<Genre>(exclude)] = FilterState.Exclude;
+                }
+
+                foreach (var include in IncludeProductionCompanies)
+                {
+                    query.ProductionCompanyFilters[include] = FilterState.Include;
+                }
+
+                foreach (var exclude in ExcludeProductionCompanies)
+                {
+                    query.ProductionCompanyFilters[exclude] = FilterState.Exclude;
                 }
 
                 return query;

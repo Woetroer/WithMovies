@@ -6,6 +6,5 @@ namespace WithMovies.Domain.Interfaces
     {
         Task ImportJsonAsync(Stream json);
         Task<IQueryable<Keyword>> FindKeywords(string[] names);
-        Task<List<KeywordSuggestion>> FindKeywordSuggestions(string text);
     }
 }

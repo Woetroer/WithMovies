@@ -230,7 +230,36 @@ namespace WithMovies.Business.Services
         {
             DateTime startTime = DateTime.Now;
 
-            var movies = _dataContext.LoadExtension("math").Movies.AsQueryable();
+            var movies = _dataContext.Movies.AsQueryable();
+
+            if (query.Collection != null)
+            {
+                movies = movies.Where(
+                    m =>
+                        m.BelongsToCollection != null
+                        && m.BelongsToCollection.Name == query.Collection
+                );
+            }
+
+            var excludeCompanyFilters = query.GetExcludeProductionCompanyFilters();
+            if (excludeCompanyFilters.Length > 0)
+            {
+                movies = movies.Where(
+                    m => !m.ProductionCompanies.Any(k => excludeCompanyFilters.Contains(k.Name))
+                );
+            }
+
+            var includeCompanyFilters = query.GetIncludeProductionCompanyFilters().ToList();
+            if (includeCompanyFilters.Count > 0)
+            {
+                var filterCount = includeCompanyFilters.Count;
+                movies = movies.Where(
+                    m =>
+                        m.ProductionCompanies
+                            .Where(c => includeCompanyFilters.Contains(c.Name))
+                            .Count() == filterCount
+                );
+            }
 
             var excludeFilters = query.GetExcludeFilters();
             if (excludeFilters.Length > 0)
@@ -243,8 +272,23 @@ namespace WithMovies.Business.Services
             if (includeFilters.Length > 0)
             {
                 var include = await _keywordService.FindKeywords(includeFilters);
-                movies = movies.Where(m => m.Keywords.Any(k => include.Contains(k)));
+                var filterCount = include.Count();
+                movies = movies.Where(
+                    m => m.Keywords.Where(k => include.Contains(k)).Count() == filterCount
+                );
             }
+
+            // var excludeGenreFilters = query.GetExcludeGenreFilters().ToList();
+            // foreach (var genre in excludeGenreFilters!)
+            // {
+            //     movies = movies.Where(m => !m.Genres.Any(g => GenreEqual(g, genre)));
+            // }
+
+            // var includeGenreFilters = query.GetIncludeGenreFilters().ToList();
+            // foreach (var genre in includeGenreFilters!)
+            // {
+            //     movies = movies.Where(m => m.Genres.Any(g => GenreEqual(g, genre)));
+            // }
 
             if (!string.IsNullOrWhiteSpace(query.Text))
             {
@@ -294,5 +338,9 @@ namespace WithMovies.Business.Services
                     .ToArray(),
             };
         }
+
+        // Database function, defined in SQL. Keep it here as it is used to
+        // inform Entity Framework Core about the signature of the function.
+        private static bool GenreEqual(Genre a, Genre b) => throw new NotImplementedException();
     }
 }

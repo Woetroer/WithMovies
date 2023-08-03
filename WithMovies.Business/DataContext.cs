@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore.Storage;
 using WithMovies.Domain;
 using WithMovies.Domain.Enums;
 using WithMovies.Domain.Models;
@@ -25,11 +29,27 @@ namespace WithMovies.Business
         public DataContext(DbContextOptions<DataContext> options)
             : base(options) { }
 
-        protected DataContext(DbContextOptions options)
-            : base(options) { }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder
+                .HasDbFunction(
+                    typeof(DataContext).GetMethod(
+                        nameof(GenreEqual),
+                        new[] { typeof(Genre), typeof(Genre) }
+                    )!
+                )
+                .HasName("GenreEqual")
+                .HasTranslation(
+                    args =>
+                        new SqlBinaryExpression(
+                            ExpressionType.Equal,
+                            args.First(),
+                            args.Skip(1).First(),
+                            typeof(bool),
+                            new BoolTypeMapping("INTEGER")
+                        )
+                );
+
             modelBuilder
                 .Entity<Movie>()
                 .Property(e => e.Genres)
@@ -122,5 +142,9 @@ namespace WithMovies.Business
 
             base.OnModelCreating(modelBuilder);
         }
+
+        // Database function, defined in SQL. Keep it here as it is used to
+        // inform Entity Framework Core about the signature of the function.
+        public bool GenreEqual(Genre a, Genre b) => throw new NotImplementedException();
     }
 }

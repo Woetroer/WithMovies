@@ -231,14 +231,13 @@ namespace WithMovies.Business.Services
             {
                 foreach (Genre genre in movie.Genres)
                 {
-                    if (!genres.Contains((int)genre))
                         genres.Add((int)genre);
                 }
             }
             return genres;
         }
 
-            public async Task<IQueryable<Movie>> GetFriendMovies(User user)
+        public async Task<IQueryable<Movie>> GetFriendMovies(User user)
         {
             throw new NotImplementedException();
         }

@@ -7,4 +7,5 @@ public class SearchResults
     /// </summary>
     public required double Time { get; set; }
     public required PreviewDto[] Movies { get; set; }
+    public required int ResultCount { get; set; }
 }

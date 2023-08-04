@@ -86,7 +86,7 @@ namespace WithMovies.WebApi.Controllers
             if (review == null)
                 return NotFound();
 
-            if (review.Author.UserName != User.Identity!.Name!)
+            if (review.Author.UserName != User.Identity!.Name! || !review.Author.CanReview)
                 return Unauthorized();
 
             review.Message = reviewToUpdate.Message;

@@ -353,6 +353,8 @@ namespace WithMovies.Business.Services
             if (query.SortDirection == SortDirection.Ascending)
                 movies = movies.Reverse();
 
+            var resultCount = await movies.CountAsync();
+
             movies = movies.Skip(start).Take(limit);
 
             double time = (DateTime.Now - startTime).TotalSeconds;
@@ -372,6 +374,7 @@ namespace WithMovies.Business.Services
                             }
                     )
                     .ToArray(),
+                ResultCount = resultCount,
             };
         }
 

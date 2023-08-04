@@ -308,6 +308,12 @@ namespace WithMovies.Business.Services
                 );
             }
 
+            if (query.Adult != FilterState.None)
+            {
+                bool state = query.Adult == FilterState.Include;
+                movies = movies.Where(m => m.Adult == state);
+            }
+
             // var excludeGenreFilters = query.GetExcludeGenreFilters().ToList();
             // foreach (var genre in excludeGenreFilters!)
             // {

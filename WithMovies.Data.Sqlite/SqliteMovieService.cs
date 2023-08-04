@@ -192,20 +192,24 @@ namespace WithMovies.Business.Services
                 .LoadExtension("math")
                 .Movies.FromSqlRaw(
                     """
-                    SELECT *, AVG(KwWeight) AS Weight
+                    SELECT Movies.*, AVG(InternalQuery.KwWeight) AS Weight
                     FROM Movies,
                          (
                              SELECT r.KeywordId AS KeywordId,
                                     r.Weight AS KwWeight,
-                                    l.MoviesId AS MovieId
+                                    l.MoviesId AS lMovieId
                              FROM KeywordMovie l
                              INNER JOIN WeightedKeywords r
                              ON l.KeywordsId = r.KeywordId
                              WHERE r.ParentId = :rProfileId
-                         )
-                    WHERE Movies.Id = MovieId
-                    GROUP BY MovieId
-                    ORDER BY Weight * Weight DESC
+                         ) InternalQuery
+                    LEFT JOIN RecommendationProfileInputs rpi ON
+                        Movies.Id = rpi.MovieId
+                        AND rpi.ParentId = :rProfileId
+                    WHERE Movies.Id = InternalQuery.lMovieId
+                    AND (rpi.Watched IS NULL OR rpi.Watched = FALSE)
+                    GROUP BY InternalQuery.lMovieId
+                    ORDER BY Weight DESC
                     LIMIT :limit
                     OFFSET :start
                     """,

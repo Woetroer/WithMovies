@@ -17,18 +17,21 @@ namespace WithMovies.WebApi.Controllers
         private readonly IMovieService _movieService;
         private readonly UserManager<User> _userManager;
         private readonly DataContext _dataContext;
+        private readonly IRecommendationService _recommendationService;
 
         public ReviewController(
             IReviewService reviewService,
             IMovieService movieService,
             UserManager<User> userManager,
-            DataContext dataContext
+            DataContext dataContext,
+            IRecommendationService recommendationService
         )
         {
             _reviewService = reviewService;
             _movieService = movieService;
             _userManager = userManager;
             _dataContext = dataContext;
+            _recommendationService = recommendationService;
         }
 
         public record ReviewToAdd(int MovieId, double Rating, string? Message);
@@ -53,6 +56,9 @@ namespace WithMovies.WebApi.Controllers
                 reviewToAdd.Message,
                 DateTime.Now
             );
+
+            await _recommendationService.FlagReviewedMovieAsync(user, movie, reviewToAdd.Rating);
+            await _dataContext.SaveChangesAsync();
 
             return Ok();
         }
@@ -87,6 +93,12 @@ namespace WithMovies.WebApi.Controllers
             review.Rating = reviewToUpdate.Rating;
 
             await _reviewService.Update(review);
+            await _recommendationService.FlagReviewedMovieAsync(
+                review.Author,
+                review.Movie,
+                reviewToUpdate.Rating
+            );
+            await _dataContext.SaveChangesAsync();
 
             return Ok();
         }

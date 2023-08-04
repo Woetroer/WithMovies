@@ -7,4 +7,5 @@ public interface IRecommendationService
     public Task RunRecommendationEngine();
 
     public Task FlagViewedDetailsPageAsync(User user, Movie movie);
+    public Task FlagReviewedMovieAsync(User user, Movie movie, double rating);
 }

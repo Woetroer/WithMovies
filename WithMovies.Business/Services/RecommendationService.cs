@@ -25,6 +25,7 @@ public class RecommendationService : IRecommendationService
 
         engine.Modules.Add(new ExplicitelyLikedGenreModule());
         engine.Modules.Add(new VisitedKeywordsModule());
+        engine.Modules.Add(new ReviewedMoviesKeywordsModule());
 
         var users = _dataContext.Users.Where(u => u.LastLogin > DateTime.Now.AddDays(-1));
 
@@ -71,6 +72,39 @@ public class RecommendationService : IRecommendationService
         else
         {
             input.ViewedDetailsPage = true;
+            _dataContext.Update(input);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task FlagReviewedMovieAsync(User user, Movie movie, double rating)
+    {
+        var profile = user.RecommendationProfile;
+        var input = profile.Inputs
+            .AsQueryable()
+            .Include(i => i.Movie)
+            .FirstOrDefault(i => i.Movie.Id == movie.Id);
+
+        if (input == null)
+        {
+            profile.Inputs.Add(
+                new RecommendationProfileInput
+                {
+                    Movie = movie,
+                    Parent = profile,
+                    Rating = rating,
+                    Created = DateTime.Now,
+                    ViewedDetailsPage = false,
+                    Watched = true,
+                }
+            );
+            _dataContext.Update(profile);
+        }
+        else
+        {
+            input.Rating = rating;
+            input.Watched = true;
             _dataContext.Update(input);
         }
 

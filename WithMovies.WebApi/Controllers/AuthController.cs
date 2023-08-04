@@ -215,7 +215,6 @@ namespace WithMovies.WebApi.Controllers
             await _dataContext.SaveChangesAsync();
 
             return Ok();
-
         }
 
         private async Task<string> GenerateAccessToken(User user)
@@ -239,7 +238,7 @@ namespace WithMovies.WebApi.Controllers
             var tokeOptions = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
-                expires: DateTime.Now.AddMinutes(5),
+                expires: DateTime.Now.AddDays(5),
                 claims: claims,
                 signingCredentials: new SigningCredentials(
                     authSigningKey,

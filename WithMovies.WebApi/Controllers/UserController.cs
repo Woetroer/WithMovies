@@ -141,7 +141,7 @@ namespace WithMovies.WebApi.Controllers
         [HttpGet("all-users"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsersCount()
         {
-            return Ok(_userService.GetAllCount());
+            return Ok(await _userService.GetAllCount());
         }
     }
 }

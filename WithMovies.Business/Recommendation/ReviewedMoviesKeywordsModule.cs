@@ -10,7 +10,11 @@ public class ReviewedMoviesKeywordsModule : RecommendationModule
         {
             foreach (var keyword in input.Movie.Keywords)
             {
-                if (keyword.Name == "duringcreditsstinger" || keyword.Name == "aftercreditsstinger")
+                if (
+                    keyword.Name == "duringcreditsstinger"
+                    || keyword.Name == "aftercreditsstinger"
+                    || keyword.Name == "based on novel"
+                )
                     continue;
 
                 AddKeywordWeight(keyword, (float)input.Rating! / 2.5f);

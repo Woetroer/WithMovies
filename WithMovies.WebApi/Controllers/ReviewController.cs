@@ -72,7 +72,10 @@ namespace WithMovies.WebApi.Controllers
                 return NotFound();
 
             return Ok(
-                movie.Reviews.AsQueryable().Include(r => r.Movie).Select(ReviewExtensions.ToDto)
+                movie.Reviews
+                    .AsQueryable()
+                    .OrderByDescending(r => r.PostedTime)
+                    .Select(ReviewExtensions.ToDto)
             );
         }
 

@@ -1,6 +1,5 @@
 # WithMovies
-Find movies you like and rate yo
-ur experience after you watched a movie!
+Find the movies you love and rate your experience after you watched one!
 
 Front Page
 -
